@@ -152,6 +152,11 @@ namespace MilibooAPI.Models.EntityFramework
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("fk_avc_prd");
 
+                entity.HasOne(d => d.IdclientNavigation)
+                    .WithMany(p => p.AvisClients)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_avc_clt");
+
             });
 
             modelBuilder.Entity<Boutique>(entity =>
@@ -276,6 +281,11 @@ namespace MilibooAPI.Models.EntityFramework
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("fk_dmd_prd");
 
+                entity.HasOne(d => d.IdProfessionnelNavigation)
+                    .WithMany(p => p.Demandes)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_dmd_prf");
+
 
             });
 
@@ -286,29 +296,7 @@ namespace MilibooAPI.Models.EntityFramework
 
             });
 
-            modelBuilder.Entity<EstAjouteDans>(entity =>
-            {
-                entity.HasKey(e => new { e.ProduitId, e.ColorisId, e.PanierId })
-                    .HasName("pk_ejd");
-
-                entity.HasOne(d => d.IdcolorisNavigation)
-                    .WithMany(p => p.EstAjouteDanss)
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .HasConstraintName("fk_ejd_clr");
-
-                entity.HasOne(d => d.IdpanierNavigation)
-                    .WithMany(p => p.EstAjouteDanss)
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .HasConstraintName("fk_ejd_pan");
-
-                entity.HasOne(d => d.IdproduitNavigation)
-                    .WithMany(p => p.EstAjouteDanss)
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .HasConstraintName("fk_ejd_prd");
-
-
-            });
-
+            
             modelBuilder.Entity<EstAjouteDans>(entity =>
             {
                 entity.HasKey(e => new { e.ProduitId, e.ColorisId, e.PanierId })
@@ -490,6 +478,11 @@ namespace MilibooAPI.Models.EntityFramework
                     .HasName("pk_pyp");
 
                 entity.Property(e => e.Libelletypepaiement).HasDefaultValue("Paypal");
+
+                entity.HasOne(d => d.IdPaypalNavigation)
+                    .WithMany(p => p.Paypals)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_pyp_tpp");
             });
 
             modelBuilder.Entity<Pays>(entity =>
