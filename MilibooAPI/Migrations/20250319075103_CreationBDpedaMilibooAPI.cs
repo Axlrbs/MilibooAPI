@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MilibooAPI.Migrations
 {
     /// <inheritdoc />
-    public partial class CreationBDmilibooAPI : Migration
+    public partial class CreationBDpedaMilibooAPI : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

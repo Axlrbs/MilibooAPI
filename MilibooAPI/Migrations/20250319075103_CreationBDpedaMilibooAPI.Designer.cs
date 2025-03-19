@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MilibooAPI.Models.EntityFramework;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MilibooAPI.Migrations
 {
     [DbContext(typeof(MilibooDBContext))]
-    partial class MilibooContextModelSnapshot : ModelSnapshot
+    [Migration("20250319075103_CreationBDpedaMilibooAPI")]
+    partial class CreationBDpedaMilibooAPI
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -727,7 +730,7 @@ namespace MilibooAPI.Migrations
                         .HasColumnName("lik_idclient");
 
                     b.HasKey("ProduitId", "ClientId")
-                        .HasName("pk_eid");
+                        .HasName("pk_lik");
 
                     b.HasIndex("ClientId");
 
