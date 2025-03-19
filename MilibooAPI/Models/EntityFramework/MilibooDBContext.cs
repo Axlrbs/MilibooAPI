@@ -95,10 +95,11 @@ namespace MilibooAPI.Models.EntityFramework
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("fk_apr_adr");
 
-                /*  entity.HasOne(d => d.IdClientNavigation)
-                        .WithMany(p => p.Apours)
-                        .OnDelete(DeleteBehavior.Restrict) ->>> Manque une invers property
-                        .HasConstraintName("fk_adr_pyp");*/
+                entity.HasOne(d => d.IdClientNavigation)
+                    .WithMany(p => p.APours)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_apr_clt");
+
             });
 
             modelBuilder.Entity<Adresse>(entity =>
@@ -108,10 +109,10 @@ namespace MilibooAPI.Models.EntityFramework
                 entity.Property(e => e.CodePostal).IsFixedLength();
                 entity.Property(e => e.NumeroInsee).IsFixedLength();
 
-                /* entity.HasOne(d => d.NumeroinseeNavigation)
-                    .WithMany(p => p.NumeroInsee) <-- PB ici le num insee veut pas
+                entity.HasOne(d => d.IdVilleNavigation)
+                    .WithMany(p => p.Adresses)
                     .OnDelete(DeleteBehavior.Restrict)
-                    .HasConstraintName("fk_adr_utl"); */
+                    .HasConstraintName("fk_apr_vil");
 
                 entity.HasOne(d => d.IdPaysNavigation)
                     .WithMany(p => p.Adresses)
@@ -210,7 +211,42 @@ namespace MilibooAPI.Models.EntityFramework
 
                 entity.Property(e => e.DateFacture).HasDefaultValueSql("now()");
 
-                // Modele a chier faut refaire les inverse property
+                entity.HasOne(d => d.IdPanierNavigation)
+                    .WithMany(p => p.Commandes)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_cmd_pan");
+
+                entity.HasOne(d => d.IdClientNavigation)
+                    .WithMany(p => p.Commandes)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_cmd_clt");
+
+                entity.HasOne(d => d.IdVirementNavigation)
+                    .WithMany(p => p.Commandes)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_cmd_vba");
+
+                entity.HasOne(d => d.IdLivraisonNavigation)
+                    .WithMany(p => p.Commandes)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_cmd_liv");
+
+                entity.HasOne(d => d.IdBoutiqueNavigation)
+                    .WithMany(p => p.Commandes)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_cmd_btq");
+
+                entity.HasOne(d => d.IdPaypalNavigation)
+                    .WithMany(p => p.Commandes)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_cmd_pyp");
+
+                entity.HasOne(d => d.IdCarteNavigation)
+                    .WithMany(p => p.Commandes)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_cmd_crtban");
+
+
             });
 
             modelBuilder.Entity<Constitue>(entity =>
@@ -301,7 +337,15 @@ namespace MilibooAPI.Models.EntityFramework
                 entity.HasKey(e => new { e.CommandeId, e.EstDeCouleurId })
                     .HasName("pk_esc");
 
-                // Manque property FK
+                entity.HasOne(d => d.IdCommandeNavigation)
+                   .WithMany(p => p.EstCommandes)
+                   .OnDelete(DeleteBehavior.Restrict)
+                   .HasConstraintName("fk_esc_cmd");
+
+                entity.HasOne(d => d.IdEstDeCouleurNavigation)
+                   .WithMany(p => p.EstCommandes)
+                   .OnDelete(DeleteBehavior.Restrict)
+                   .HasConstraintName("fk_esc_edc");
 
             });
 
@@ -434,7 +478,10 @@ namespace MilibooAPI.Models.EntityFramework
 
                 entity.Property(e => e.Dateetheure).HasDefaultValueSql("now()");
 
-                //Manque FK Client
+                entity.HasOne(d => d.IdClientNavigation)
+                    .WithMany(p => p.Paniers)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_pan_clt");
             });
 
             modelBuilder.Entity<Paypal>(entity =>
@@ -494,7 +541,12 @@ namespace MilibooAPI.Models.EntityFramework
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("fk_rch_prd");
 
-                //Manque FK client
+                entity.HasOne(d => d.IdClientNavigation)
+                    .WithMany(p => p.Recherches)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_rch_clt");
+
+                
 
             });
 
@@ -515,7 +567,12 @@ namespace MilibooAPI.Models.EntityFramework
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("fk_sst_adr");
 
-                //Manque FK professionnel
+                entity.HasOne(d => d.IdProfessionnelNavigation)
+                    .WithMany(p => p.SeSitues)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_sst_prf");
+
+                
 
             });
 
