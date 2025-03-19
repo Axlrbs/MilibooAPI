@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using MilibooAPI.Models.DataManager;
 using MilibooAPI.Models.EntityFramework;
+using MilibooAPI.Models.Repository;
 using static MilibooAPI.Models.EntityFramework.MilibooDBContext;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +12,9 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddScoped<IDataRepository<Client>, ClientManager>();
+builder.Services.AddScoped<IDataRepository<Professionnel>, ProfessionnelManager>();
+
 
 builder.Services.AddDbContext<MilibooDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MilibooConnection")));
