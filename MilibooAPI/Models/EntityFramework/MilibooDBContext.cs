@@ -400,8 +400,16 @@ namespace MilibooAPI.Models.EntityFramework
                 entity.HasKey(e => new { e.ProduitId, e.ClientId })
                     .HasName("pk_lik");
 
-                // manque fk produit et client
+                entity.HasOne(d => d.IdClientNavigation)
+                    .WithMany(p => p.Likers)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_lik_clt");
 
+
+                entity.HasOne(d => d.IdproduitNavigation)
+                    .WithMany(p => p.Likers)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("fk_lik_prd");
             });
 
 
