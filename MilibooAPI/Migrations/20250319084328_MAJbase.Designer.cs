@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MilibooAPI.Migrations
 {
     [DbContext(typeof(MilibooDBContext))]
-    [Migration("20250319082609_testpush3")]
-    partial class testpush3
+    [Migration("20250319084328_MAJbase")]
+    partial class MAJbase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
