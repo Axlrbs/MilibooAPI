@@ -14,6 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDataRepository<Client>, ClientManager>();
 builder.Services.AddScoped<IDataRepository<Professionnel>, ProfessionnelManager>();
+builder.Services.AddScoped<IDataRepository<EstDeCouleur>, EstDeCouleurManager>();
 
 
 builder.Services.AddDbContext<MilibooDBContext>(options =>
