@@ -74,9 +74,9 @@ namespace MilibooAPI.Controllers
         /// Modifie (put) un produit
         /// </summary>
         /// <param name="id">L'id du client à produit</param>
-        /// <param name="estDeCouleur">Le client produit</param>
+        /// <param name="estDeCouleur">Le produita modifié </param>
         /// <returns>Réponse http</returns>
-        /// <response code="204">Quand le client a été produit avec succès</response>
+        /// <response code="204">Quand le produit a été modifié avec succès</response>
         /// <response code="400">Quand l'id ne correspond pas ou que le format du produit est incorrect</response>
         /// <response code="404">Quand le produit n'a pas été trouvé</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
