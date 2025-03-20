@@ -14,21 +14,146 @@ namespace MilibooAPI.Controllers
     [ApiController]
     public class EstDeCouleursController : ControllerBase
     {
-        //private readonly MilibooDBContext _context;
         private readonly IDataRepository<EstDeCouleur> dataRepository;
+        private readonly MilibooDBContext _context; // Ajout du contexte pour pouvoir faire des requêtes plus complexes
 
         /// <summary>
         /// Constructeur du controller
         /// </summary>
-        public EstDeCouleursController(IDataRepository<EstDeCouleur> dataRepo)
+        public EstDeCouleursController(IDataRepository<EstDeCouleur> dataRepo, MilibooDBContext context)
         {
             dataRepository = dataRepo;
+            _context = context;
         }
 
-        /*public EstDeCouleursController(MilibooDBContext context)
+        /// <summary>
+        /// Récupère (get) tous les produits de chaque couleur avec leurs photos
+        /// </summary>
+        /// <returns>Réponse http</returns>
+        /// <response code="200">Quand tous les produits ont été renvoyés avec succès</response>
+        /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        // GET: api/EstDeCouleurs/GetAllEstDeCouleursWithPhotos
+        [HttpGet("[action]")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<object>>> GetAllEstDeCouleursWithPhotos()
         {
-            _context = context;
-        }*/
+            try
+            {
+                var estDeCouleurs = await _context.EstDeCouleurs
+                    .Include(e => e.IdproduitNavigation) // Inclure les informations du produit
+                    .Include(e => e.IdcolorisNavigation) // Inclure les informations de la couleur
+                    .ToListAsync();
+
+                var result = estDeCouleurs.Select(e => new {
+                    e.EstDeCouleurId,
+                    e.ColorisId,
+                    e.ProduitId,
+                    e.Codephoto,
+                    e.Nomproduit,
+                    e.Prixttc,
+                    e.Description,
+                    e.Quantite,
+                    e.Promotion,
+                    PhotoUrl = GetPhotoUrl(e.Codephoto), // Ajouter l'URL de la photo
+                    Coloris = e.IdcolorisNavigation != null ? new
+                    {
+                        e.IdcolorisNavigation.ColorisId,
+                        e.IdcolorisNavigation.LibelleColoris
+                    } : null,
+                    Produit = e.IdproduitNavigation != null ? new
+                    {
+                        e.IdproduitNavigation.ProduitId,
+                        e.IdproduitNavigation.Reference
+                    } : null
+                });
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Récupère (get) un produit par son ID avec sa photo
+        /// </summary>
+        /// <param name="id">L'id du produit</param>
+        /// <returns>Réponse http</returns>
+        /// <response code="200">Quand le produit a été trouvé</response>
+        /// <response code="404">Quand le produit n'a pas été trouvé</response>
+        /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        // GET: api/EstDeCouleurs/GetEstDeCouleurWithPhotoById/{id}
+        [HttpGet("[action]/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<object>> GetEstDeCouleurWithPhotoById(int id)
+        {
+            try
+            {
+                var estDeCouleur = await _context.EstDeCouleurs
+                    .Include(e => e.IdproduitNavigation)
+                    .Include(e => e.IdcolorisNavigation)
+                    .FirstOrDefaultAsync(e => e.EstDeCouleurId == id);
+
+                if (estDeCouleur == null)
+                {
+                    return NotFound(new { message = $"EstDeCouleur avec l'ID {id} n'a pas été trouvé" });
+                }
+
+                var result = new
+                {
+                    estDeCouleur.EstDeCouleurId,
+                    estDeCouleur.ColorisId,
+                    estDeCouleur.ProduitId,
+                    estDeCouleur.Codephoto,
+                    estDeCouleur.Nomproduit,
+                    estDeCouleur.Prixttc,
+                    estDeCouleur.Description,
+                    estDeCouleur.Quantite,
+                    estDeCouleur.Promotion,
+                    PhotoUrl = GetPhotoUrl(estDeCouleur.Codephoto),
+                    Coloris = estDeCouleur.IdcolorisNavigation != null ? new
+                    {
+                        estDeCouleur.IdcolorisNavigation.ColorisId,
+                        estDeCouleur.IdcolorisNavigation.LibelleColoris
+                    } : null,
+                    Produit = estDeCouleur.IdproduitNavigation != null ? new
+                    {
+                        estDeCouleur.IdproduitNavigation.ProduitId,
+                        estDeCouleur.IdproduitNavigation.Reference
+                    } : null
+                };
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Récupère l'URL de la photo à partir du code photo
+        /// </summary>
+        /// <param name="codePhoto">Le code de la photo</param>
+        /// <returns>L'URL de la photo</returns>
+        private string GetPhotoUrl(string codePhoto)
+        {
+            if (string.IsNullOrEmpty(codePhoto))
+                return null;
+
+            // Récupérer la photo depuis la base de données
+            var photo = _context.Photos.FirstOrDefault(p => p.CodePhoto == codePhoto);
+
+            if (photo == null)
+                return null;
+
+            // Retourner l'URL de la photo
+            return $"{photo.Urlphoto}";
+        }
 
         /// <summary>
         /// Récupère (get) tous les produits de chaque couleur
@@ -69,6 +194,62 @@ namespace MilibooAPI.Controllers
 
             return estdecouleur;
         }
+
+        /// <summary>
+        /// Récupère (get) la première ligne de chaque EstDeCouleur par ProduitId
+        /// </summary>
+        /// <returns>Réponse http</returns>
+        /// <response code="200">Quand les premières lignes ont été renvoyées avec succès</response>
+        /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        // GET: api/EstDeCouleurs/FirstForEachProduit
+        [HttpGet("FirstForEachProduit")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<EstDeCouleur>>> GetFirstEstDeCouleurForEachProduit()
+        {
+            // Récupérer toutes les EstDeCouleur
+            var result = await dataRepository.GetAllAsync();
+
+            // Assure-toi que la réponse contient des données
+            if (result.Value == null || !result.Value.Any())
+            {
+                return NoContent();
+            }
+
+            // Appliquer GroupBy sur la collection de EstDeCouleur
+            var firstEstDeCouleurs = result.Value
+                .GroupBy(e => e.ProduitId)  // Groupement par ProduitId
+                .Select(g => g.OrderBy(e =>
+                {
+                    // Tenter de convertir Codephoto en entier pour un tri numérique
+                    int codephotoInt;
+                    return int.TryParse(e.Codephoto, out codephotoInt) ? codephotoInt : int.MaxValue; // Si ça échoue, on met une valeur très élevée
+                })
+                .FirstOrDefault())  // Sélectionner la première ligne (avec le Codephoto le plus bas après conversion)
+                .ToList();
+
+            // Si aucun résultat n'est trouvé après le groupement
+            if (!firstEstDeCouleurs.Any())
+            {
+                return NoContent();
+            }
+
+            // Joindre les EstDeCouleurs avec l'URL de la photo en utilisant la méthode GetPhotoUrl
+            var estDeCouleursWithPhotos = firstEstDeCouleurs
+                .Select(e => new
+                {
+                    EstDeCouleur = e,
+                    // Récupérer l'URL de la photo à l'aide de la méthode GetPhotoUrl
+                    UrlPhoto = GetPhotoUrl(e.Codephoto)
+                })
+                .ToList();
+
+            // Retourner les résultats avec l'URL de la photo
+            return Ok(estDeCouleursWithPhotos);
+        }
+
+
+
 
         /// <summary>
         /// Modifie (put) un produit
@@ -160,10 +341,5 @@ namespace MilibooAPI.Controllers
 
             return NoContent();
         }
-
-        /*private bool EstDeCouleurExists(int id)
-        {
-            return _context.EstDeCouleurs.Any(e => e.EstDeCouleurId == id);
-        }*/
     }
 }
