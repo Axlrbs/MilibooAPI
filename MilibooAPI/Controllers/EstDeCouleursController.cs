@@ -234,13 +234,13 @@ namespace MilibooAPI.Controllers
                 return NoContent();
             }
 
-            // Joindre les EstDeCouleurs avec la table Photo pour obtenir l'URL de la photo
+            // Joindre les EstDeCouleurs avec l'URL de la photo en utilisant la méthode GetPhotoUrl
             var estDeCouleursWithPhotos = firstEstDeCouleurs
                 .Select(e => new
                 {
                     EstDeCouleur = e,
-                    // Joindre la table Photo en fonction du Codephoto
-                    UrlPhoto = result.Value.FirstOrDefault(p => p.Codephoto == e.Codephoto)?.Urlphoto
+                    // Récupérer l'URL de la photo à l'aide de la méthode GetPhotoUrl
+                    UrlPhoto = GetPhotoUrl(e.Codephoto)
                 })
                 .ToList();
 
