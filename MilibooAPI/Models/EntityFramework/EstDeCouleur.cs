@@ -46,7 +46,7 @@ namespace MilibooAPI.Models.EntityFramework
         public virtual Coloris IdcolorisNavigation { get; set; } = null!;
 
         [ForeignKey(nameof(ProduitId))]
-        [InverseProperty(nameof(Coloris.EstDeCouleurs))]
+        [InverseProperty(nameof(Produit.EstDeCouleurs))]
         public virtual Produit IdproduitNavigation { get; set; } = null!;
 
         [InverseProperty(nameof(EstCommande.IdEstDeCouleurNavigation))]
