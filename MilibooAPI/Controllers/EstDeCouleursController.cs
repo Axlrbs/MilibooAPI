@@ -71,6 +71,62 @@ namespace MilibooAPI.Controllers
         }
 
         /// <summary>
+        /// Récupère (get) la première ligne de chaque EstDeCouleur par ProduitId
+        /// </summary>
+        /// <returns>Réponse http</returns>
+        /// <response code="200">Quand les premières lignes ont été renvoyées avec succès</response>
+        /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        // GET: api/EstDeCouleurs/FirstForEachProduit
+        [HttpGet("FirstForEachProduit")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<EstDeCouleur>>> GetFirstEstDeCouleurForEachProduit()
+        {
+            // Récupérer toutes les EstDeCouleur
+            var result = await dataRepository.GetAllAsync();
+
+            // Assure-toi que la réponse contient des données
+            if (result.Value == null || !result.Value.Any())
+            {
+                return NoContent();
+            }
+
+            // Appliquer GroupBy sur la collection de EstDeCouleur
+            var firstEstDeCouleurs = result.Value
+                .GroupBy(e => e.ProduitId)  // Groupement par ProduitId
+                .Select(g => g.OrderBy(e =>
+                {
+                    // Tenter de convertir Codephoto en entier pour un tri numérique
+                    int codephotoInt;
+                    return int.TryParse(e.Codephoto, out codephotoInt) ? codephotoInt : int.MaxValue; // Si ça échoue, on met une valeur très élevée
+                })
+                .FirstOrDefault())  // Sélectionner la première ligne (avec le Codephoto le plus bas après conversion)
+                .ToList();
+
+            // Si aucun résultat n'est trouvé après le groupement
+            if (!firstEstDeCouleurs.Any())
+            {
+                return NoContent();
+            }
+
+            // Joindre les EstDeCouleurs avec la table Photo pour obtenir l'URL de la photo
+            var estDeCouleursWithPhotos = firstEstDeCouleurs
+                .Select(e => new
+                {
+                    EstDeCouleur = e,
+                    // Joindre la table Photo en fonction du Codephoto
+                    UrlPhoto = result.Value.FirstOrDefault(p => p.Codephoto == e.Codephoto)?.Urlphoto
+                })
+                .ToList();
+
+            // Retourner les résultats avec l'URL de la photo
+            return Ok(estDeCouleursWithPhotos);
+        }
+
+
+
+
+        /// <summary>
         /// Modifie (put) un produit
         /// </summary>
         /// <param name="id">L'id du client à produit</param>
