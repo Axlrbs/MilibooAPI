@@ -12,36 +12,37 @@ namespace MilibooAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ClientsController : ControllerBase
+    public class AvisClientController : ControllerBase
     {
         //private readonly MilibooContext _context;
-        private readonly IDataRepository<Client> dataRepository;
+        private readonly IDataRepository<AvisClient> dataRepository;
 
         /// <summary>
         /// Constructeur du controller
         /// </summary>
-        public ClientsController(IDataRepository<Client> dataRepo)
+        public AvisClientController(IDataRepository<AvisClient> dataRepo)
         {
             dataRepository = dataRepo;
         }
-        /*public ClientsController(MilibooContext context)
+        /*public AvisClientController(MilibooDBContext context)
         {
             _context = context;
         }*/
 
         /// <summary>
-        /// Récupère (get) tous les clients
+        /// Récupère (get) tous les avis clients
         /// </summary>
         /// <returns>Réponse http</returns>
-        /// <response code="200">Quand tous les clients ont été renvoyés avec succès</response>
+        /// <response code="200">Quand tous les avis clients ont été renvoyés avec succès</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // GET: api/Clients/GetAllClients
+        // GET: api/AvisClient
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Client>>> GetAllClients()
+        public async Task<ActionResult<IEnumerable<AvisClient>>> GetAvisClients()
         {
             return await dataRepository.GetAllAsync();
+
         }
 
         /// <summary>
@@ -52,46 +53,21 @@ namespace MilibooAPI.Controllers
         /// <response code="200">Quand le client a été trouvé</response>
         /// <response code="404">Quand le client n'a pas été trouvé</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // GET: api/Clients/GetClientById/{id}
+        // GET: api/AvisClient/5
         [HttpGet("[action]/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Client>> GetClientById(int id)
+        public async Task<ActionResult<AvisClient>> GetAvisClient(int id)
         {
-            var client = await dataRepository.GetByIdAsync(id);
+            var avisClient = await dataRepository.GetByIdAsync(id);
 
-            if (client == null)
+            if (avisClient == null)
             {
                 return NotFound();
             }
 
-            return client;
-        }
-
-        /// <summary>
-        /// Récupère (get) un client par son nom
-        /// </summary>
-        /// <param name="nom">Le nom du client</param>
-        /// <returns>Réponse http</returns>
-        /// <response code="200">Quand le client a été trouvé</response>
-        /// <response code="404">Quand le client n'a pas été trouvé</response>
-        /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // GET: api/Clients/GetClientByNom/{nom}
-        [HttpGet("[action]/{nom}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Client>> GetClientByNom(string nom)
-        {
-            var client = await dataRepository.GetByStringAsync(nom);
-
-            if (client == null)
-            {
-                return NotFound();
-            }
-
-            return client;
+            return avisClient;
         }
 
         /// <summary>
@@ -104,15 +80,16 @@ namespace MilibooAPI.Controllers
         /// <response code="400">Quand l'id ne correspond pas ou que le format du client est incorrect</response>
         /// <response code="404">Quand le client n'a pas été trouvé</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // PUT: api/Clients/PutClient/{id}
+        // PUT: api/AvisClient/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> PutClient(int id, Client client)
+        public async Task<IActionResult> PutAvisClient(int id, AvisClient avisClient)
         {
-            if (id != client.ClientId)
+            if (id != avisClient.AvisId)
             {
                 return BadRequest();
             }
@@ -122,14 +99,14 @@ namespace MilibooAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var userToUpdate = await dataRepository.GetByIdAsync(id);
-            if (userToUpdate == null)
+            var opinionToUpdate = await dataRepository.GetByIdAsync(id);
+            if (opinionToUpdate == null)
             {
                 return NotFound();
             }
             else
             {
-                await dataRepository.UpdateAsync(userToUpdate.Value, client);
+                await dataRepository.UpdateAsync(opinionToUpdate.Value, avisClient);
                 return NoContent();
             }
         }
@@ -142,52 +119,53 @@ namespace MilibooAPI.Controllers
         /// <response code="201">Quand le client a été créé avec succès</response>
         /// <response code="400">Quand le format du client dans le corps de la requête est incorrect</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // POST: api/Clients/PostClient
+        // POST: api/AvisClient
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Client>> PostClient(Client client)
+        public async Task<ActionResult<AvisClient>> PostAvisClient(AvisClient avisClient)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            await dataRepository.AddAsync(client);
+            await dataRepository.AddAsync(avisClient);
 
-            return CreatedAtAction("GetClientById", new { id = client.ClientId }, client);
+            return CreatedAtAction("GetAvisClientById", new { id = avisClient.AvisId }, avisClient);
         }
 
         /// <summary>
-        /// Supprime (delete) un client
+        /// Supprime (delete) un avis client
         /// </summary>
-        /// <param name="id">L'id du client à supprimer</param>
+        /// <param name="id">L'id de l'avis client à supprimer</param>
         /// <returns>Réponse http</returns>
-        /// <response code="204">Quand le client a été supprimé avec succès</response>
-        /// <response code="404">Quand le client n'a pas été trouvé</response>
+        /// <response code="204">Quand l'avis client a été supprimé avec succès</response>
+        /// <response code="404">Quand l'avis client n'a pas été trouvé</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // DELETE: api/Clients/DeleteClient/{id}
+        // DELETE: api/AvisClient/5
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteClient(int id)
+        public async Task<IActionResult> DeleteAvisClient(int id)
         {
-            var client = await dataRepository.GetByIdAsync(id);
-
-            if (client == null)
+            var avisClient = await dataRepository.GetByIdAsync(id);
+            
+            if (avisClient == null)
             {
                 return NotFound();
             }
 
-            await dataRepository.DeleteAsync(client.Value);
+            await dataRepository.DeleteAsync(avisClient.Value);
 
             return NoContent();
         }
 
-        /*private bool ClientExists(int id)
+        /*private bool AvisClientExists(int id)
         {
-            return _context.Clients.Any(e => e.IdClient == id);
+            return _context.AvisClients.Any(e => e.AvisId == id);
         }*/
     }
 }

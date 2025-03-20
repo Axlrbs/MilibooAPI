@@ -15,6 +15,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IDataRepository<Client>, ClientManager>();
 builder.Services.AddScoped<IDataRepository<Professionnel>, ProfessionnelManager>();
 builder.Services.AddScoped<IDataRepository<EstDeCouleur>, EstDeCouleurManager>();
+builder.Services.AddScoped<IDataRepository<AvisClient>, AvisClientManager>();
 
 
 builder.Services.AddDbContext<MilibooDBContext>(options =>
