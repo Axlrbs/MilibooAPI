@@ -248,58 +248,85 @@ namespace MilibooAPI.Controllers
             return Ok(estDeCouleursWithPhotos);
         }
 
+
+
         /// <summary>
-        /// Récupère (get) tous les IDColoris différents pour un ProduitId spécifique et leurs photos (URLs) associées
+        /// Récupère (get) toutes les photos (URLs) associées à un ProduitId et un ColorisId spécifique.
         /// </summary>
         /// <param name="produitId">L'ID du produit</param>
+        /// <param name="colorisId">L'ID du coloris</param>
         /// <returns>Réponse HTTP</returns>
-        /// <response code="200">Quand les IDColoris et URLs des photos ont été renvoyés avec succès</response>
+        /// <response code="200">Quand les URLs des photos ont été renvoyées avec succès</response>
+        /// <response code="204">Quand aucune photo n'est trouvée</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // GET: api/EstDeCouleurs/GetPhotosByCouleur/{produitId}
-        [HttpGet("GetPhotosByCouleur/{produitId}")]
+        // GET: api/EstDeCouleurs/GetPhotosByCouleur/{produitId}/{colorisId}
+        [HttpGet("GetPhotosByCouleur/{produitId}/{colorisId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<object>>> GetPhotosByCouleur(int produitId)
+        public async Task<ActionResult<IEnumerable<string>>> GetPhotosByCouleur(int produitId, int colorisId)
         {
+            // Récupérer toutes les EstDeCouleur depuis le repository
             var result = await dataRepository.GetAllAsync();
 
-            var filteredResult = result.Value?.Where(e => e.ProduitId == produitId).ToList();
+            // Filtrer par ProduitId et ColorisId
+            var filteredResult = result.Value?
+                .Where(e => e.ProduitId == produitId && e.ColorisId == colorisId)
+                .ToList();
 
+            // Vérifier s'il y a des résultats
             if (filteredResult == null || !filteredResult.Any())
             {
                 return NoContent();
             }
 
-            // Récupérer les coloris uniques pour chaque produit spécifique
-            var photosByCouleur = filteredResult
-                .GroupBy(e => new { e.ProduitId, e.ColorisId }) 
-                .Select(g => new
+            // Récupérer et trier les URLs des photos
+            var photosUrls = filteredResult
+                .Select(x => new
                 {
-                    ProduitId = g.Key.ProduitId,
-                    ColorisId = g.Key.ColorisId,
-                    PhotosURLs = g.Select(x => new
-                    {
-                        Codephoto = x.Codephoto,
-                        Url = GetPhotoUrl(x.Codephoto)  // Utilisation de GetPhotoUrl pour récupérer les URLs
-                    })
-                                   .Where(photo => photo.Url != null)  // Filtrer les photos nulles
-                                   .OrderBy(photo => photo.Codephoto)  // Tri par Codephoto de manière croissante
-                                   .Select(photo => photo.Url)  // Sélectionner uniquement l'URL après tri
-                                   .ToList()
+                    Codephoto = x.Codephoto,
+                    Url = GetPhotoUrl(x.Codephoto) // Utilisation de GetPhotoUrl
                 })
+                .Where(photo => photo.Url != null) // Supprimer les photos nulles
+                .OrderBy(photo => photo.Codephoto) // Tri par Codephoto croissant
+                .Select(photo => photo.Url) // Sélectionner uniquement l'URL après tri
                 .ToList();
 
-            // Si aucun résultat n'est trouvé
-            if (!photosByCouleur.Any())
-            {
-                return NoContent();
-            }
-
-            return Ok(photosByCouleur);
+            return Ok(photosUrls);
         }
 
+        /// <summary>
+        /// Récupère (get) toutes les couleurs (Coloris) associées à un ProduitId spécifique.
+        /// </summary>
+        /// <param name="produitId">L'ID du produit</param>
+        /// <returns>Réponse HTTP</returns>
+        /// <response code="200">Quand les couleurs ont été renvoyées avec succès</response>
+        /// <response code="404">Quand aucune couleur n'a été trouvée pour ce produit</response>
+        /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        [HttpGet("GetCouleursByProduit/{produitId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<object>>> GetCouleursByProduit(int produitId)
+        {
+            var result = await _context.EstDeCouleurs
+                .Where(e => e.ProduitId == produitId)
+                .Include(e => e.IdcolorisNavigation) // Jointure avec Coloris
+                .Select(e => new
+                {
+                    e.ColorisId,
+                    LibelleColoris = e.IdcolorisNavigation.LibelleColoris
+                })
+                .Distinct()
+                .ToListAsync();
 
+            if (result == null || !result.Any())
+            {
+                return NotFound();
+            }
 
+            return Ok(result);
+        }
 
 
 
