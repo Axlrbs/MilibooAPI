@@ -19,7 +19,7 @@ namespace MilibooAPI.Models.DataManager
         }
         public async Task<ActionResult<AvisClient>> GetByIdAsync(int id)
         {
-            return await milibooContext.AvisClients.ToListAsync(u => u.ProduitId == id);
+            return await milibooContext.AvisClients.FirstOrDefaultAsync(u => u.AvisId == id);
         }
         public async Task<ActionResult<AvisClient>> GetByStringAsync(string nom)
         {
