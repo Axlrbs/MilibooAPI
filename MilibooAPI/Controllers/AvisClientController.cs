@@ -71,14 +71,14 @@ namespace MilibooAPI.Controllers
         }
 
         /// <summary>
-        /// Modifie (put) un client
+        /// Modifie (put) un avis client
         /// </summary>
-        /// <param name="id">L'id du client à modifier</param>
-        /// <param name="client">Le client modifié</param>
+        /// <param name="id">L'id de l'avis client à modifier</param>
+        /// <param name="client">L'avis client modifié</param>
         /// <returns>Réponse http</returns>
-        /// <response code="204">Quand le client a été modifié avec succès</response>
-        /// <response code="400">Quand l'id ne correspond pas ou que le format du client est incorrect</response>
-        /// <response code="404">Quand le client n'a pas été trouvé</response>
+        /// <response code="204">Quand l'avis client a été modifié avec succès</response>
+        /// <response code="400">Quand l'id ne correspond pas ou que le format de 'l'avis client est incorrect</response>
+        /// <response code="404">Quand l'avis client n'a pas été trouvé</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
         // PUT: api/AvisClient/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -112,12 +112,12 @@ namespace MilibooAPI.Controllers
         }
 
         /// <summary>
-        /// Crée (post) un nouveau client
+        /// Crée (post) un nouvel avis client
         /// </summary>
-        /// <param name="client">Le client à créer</param>
+        /// <param name="avisClient">L'avis client à créer</param>
         /// <returns>Réponse http</returns>
-        /// <response code="201">Quand le client a été créé avec succès</response>
-        /// <response code="400">Quand le format du client dans le corps de la requête est incorrect</response>
+        /// <response code="201">Quand l'avis client a été créé avec succès</response>
+        /// <response code="400">Quand le format de l'avis client dans le corps de la requête est incorrect</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
         // POST: api/AvisClient
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
