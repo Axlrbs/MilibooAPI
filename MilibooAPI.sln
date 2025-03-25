@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35825.156 d17.13
+VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilibooAPI", "MilibooAPI\MilibooAPI.csproj", "{5CF4DED9-429D-4008-A41C-1F69400BD968}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MilibooAPI", "MilibooAPI\MilibooAPI.csproj", "{5CF4DED9-429D-4008-A41C-1F69400BD968}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MilibooAPITests", "MilibooAPITests\MilibooAPITests.csproj", "{F38804F6-CD00-4A6E-B342-AB1BBADDA22F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{5CF4DED9-429D-4008-A41C-1F69400BD968}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5CF4DED9-429D-4008-A41C-1F69400BD968}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5CF4DED9-429D-4008-A41C-1F69400BD968}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F38804F6-CD00-4A6E-B342-AB1BBADDA22F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F38804F6-CD00-4A6E-B342-AB1BBADDA22F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F38804F6-CD00-4A6E-B342-AB1BBADDA22F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F38804F6-CD00-4A6E-B342-AB1BBADDA22F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
