@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MilibooAPI.Models.EntityFramework;
+using MilibooAPI.Models.Repository;
+
 
 namespace MilibooAPI.Controllers
 {
@@ -13,11 +15,12 @@ namespace MilibooAPI.Controllers
     [ApiController]
     public class PaniersController : ControllerBase
     {
-        private readonly MilibooDBContext _context;
+        //private readonly MilibooDBContext _context;
+        private readonly IDataRepository<Panier> dataRepository;
 
-        public PaniersController(MilibooDBContext context)
+        public PaniersController(IDataRepository<Panier> dataRepo)
         {
-            _context = context;
+            dataRepository = dataRepo;
         }
 
         /// <summary>
@@ -28,46 +31,30 @@ namespace MilibooAPI.Controllers
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
         // GET: api/Paniers
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Panier>>> GetPaniers()
         {
-            return await _context.Paniers.ToListAsync();
+            return await dataRepository.GetAllAsync();
         }
 
 
         /// <summary>
-        /// Récupère (get) un Panier par son ID
-        /// </summary>
-        /// <param name="id">L'id du Panier</param>
-        /// <returns>Réponse http</returns>
-        /// <response code="200">Quand le panier a été trouvé</response>
-        /// <response code="404">Quand le panier n'a pas été trouvé</response>
-        /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // GET: api/Paniers/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Panier>> GetPanier(int id)
-        {
-            var panier = await _context.Paniers.FindAsync(id);
-
-            if (panier == null)
-            {
-                return NotFound();
-            }
-
-            return panier;
-        }
-
-        /// <summary>
-        /// Récupère un Panier par l'ID du client
+        /// Récupère (get) un Panier par l'ID du client
         /// </summary>
         /// <param name="clientId">L'ID du client</param>
         /// <returns>Réponse HTTP</returns>
         /// <response code="200">Quand le panier a été trouvé</response>
-        /// <response code="404">Quand aucun panier n'a été trouvé pour ce client</response>
+        /// <response code="404">Quand le panier n'a pas été trouvé</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        [HttpGet("ByClient/{clientId}")]
-        public async Task<ActionResult<Panier>> GetPanierByClientId(int clientId)
+        // GET: api/Paniers/5
+        [HttpGet("[action]/{clientId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Panier>> GetPanier(int clientId)
         {
-            var panier = await _context.Paniers.FirstOrDefaultAsync(p => p.ClientId == clientId);
+            var panier = await dataRepository.GetByIdAsync(clientId);  
 
             if (panier == null)
             {
@@ -102,25 +89,21 @@ namespace MilibooAPI.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(panier).State = EntityState.Modified;
-
-            try
+            if (!ModelState.IsValid)
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PanierExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(ModelState);
             }
 
-            return NoContent();
+            var opinionToUpdate = await dataRepository.GetByIdAsync(id);
+            if (opinionToUpdate == null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                await dataRepository.UpdateAsync(opinionToUpdate.Value, panier);
+                return NoContent();
+            }
         }
 
         /// <summary>
@@ -134,18 +117,23 @@ namespace MilibooAPI.Controllers
         [HttpPost]
         public async Task<ActionResult<Panier>> PostPanier(int clientId)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var panier = new Panier
             {
                 ClientId = clientId,
-                Dateetheure = DateOnly.FromDateTime(DateTime.UtcNow)
+                Dateetheure = DateOnly.FromDateTime(DateTime.UtcNow) // Date du panier
             };
-            
 
-            _context.Paniers.Add(panier);
-            await _context.SaveChangesAsync();
+            await dataRepository.AddAsync(panier);  // Ajoute le panier via ton DataRepository
 
-            return CreatedAtAction("GetPanier", new { id = panier.PanierId }, panier);
+            // Renvoie un code 201 et l'URL de l'action pour récupérer ce panier
+            return CreatedAtAction(nameof(GetPanier), new { clientId = panier.ClientId }, panier);
         }
+
 
         /// <summary>
         /// Supprime (delete) un panier
@@ -159,21 +147,20 @@ namespace MilibooAPI.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePanier(int id)
         {
-            var panier = await _context.Paniers.FindAsync(id);
+            var panier = await dataRepository.GetByIdAsync(id);
             if (panier == null)
             {
                 return NotFound();
             }
 
-            _context.Paniers.Remove(panier);
-            await _context.SaveChangesAsync();
+            await dataRepository.DeleteAsync(panier.Value);
 
             return NoContent();
         }
 
-        private bool PanierExists(int id)
+       /* private bool PanierExists(int id)
         {
             return _context.Paniers.Any(e => e.PanierId == id);
-        }
+        }*/
     }
 }
