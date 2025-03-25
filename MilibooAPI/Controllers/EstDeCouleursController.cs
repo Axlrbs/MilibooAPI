@@ -261,10 +261,8 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<object>>> GetPhotosByCouleur(int produitId)
         {
-            // Récupérer toutes les EstDeCouleur pour un ProduitId spécifique
             var result = await dataRepository.GetAllAsync();
 
-            // Assure-toi que la réponse contient des données et que le produitId existe
             var filteredResult = result.Value?.Where(e => e.ProduitId == produitId).ToList();
 
             if (filteredResult == null || !filteredResult.Any())
@@ -274,7 +272,7 @@ namespace MilibooAPI.Controllers
 
             // Récupérer les coloris uniques pour chaque produit spécifique
             var photosByCouleur = filteredResult
-                .GroupBy(e => new { e.ProduitId, e.ColorisId })  // Groupement par ProduitId et ColorisId
+                .GroupBy(e => new { e.ProduitId, e.ColorisId }) 
                 .Select(g => new
                 {
                     ProduitId = g.Key.ProduitId,
