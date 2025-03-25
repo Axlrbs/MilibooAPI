@@ -46,19 +46,19 @@ namespace MilibooAPI.Controllers
         }
 
         /// <summary>
-        /// Récupère (get) un client par son ID
+        /// Récupère (get) tous les avis des clients par son produit ID
         /// </summary>
-        /// <param name="id">L'id du client</param>
+        /// <param name="id">L'id du produit</param>
         /// <returns>Réponse http</returns>
-        /// <response code="200">Quand le client a été trouvé</response>
-        /// <response code="404">Quand le client n'a pas été trouvé</response>
+        /// <response code="200">Quand le produit a été trouvé</response>
+        /// <response code="404">Quand le produit n'a pas été trouvé</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
         // GET: api/AvisClient/5
         [HttpGet("[action]/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<AvisClient>> GetAvisClient(int id)
+        public async Task<ActionResult<AvisClient>> GetAllAvisClientByProduitId(int id)
         {
             var avisClient = await dataRepository.GetByIdAsync(id);
 

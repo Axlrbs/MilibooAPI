@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MilibooAPI.Models.EntityFramework;
 using MilibooAPI.Models.Repository;
@@ -19,7 +20,15 @@ namespace MilibooAPI.Models.DataManager
         }
         public async Task<ActionResult<AvisClient>> GetByIdAsync(int id)
         {
-            return await milibooContext.AvisClients.ToListAsync(u => u.ProduitId == id);
+            var avisClients = await milibooContext.AvisClients
+       .Where(u => u.ProduitId == id)
+       .ToListAsync();
+
+            return new ObjectResult(avisClients)
+            {
+                StatusCode = 200
+            };
+            //return await milibooContext.AvisClients.FirstOrDefaultAsync(u => u.ProduitId == id);
         }
         public async Task<ActionResult<AvisClient>> GetByStringAsync(string nom)
         {
