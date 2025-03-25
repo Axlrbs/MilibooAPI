@@ -251,20 +251,21 @@ namespace MilibooAPI.Controllers
 
 
         /// <summary>
-        /// Récupère (get) toutes les photos (URLs) associées à un ProduitId et un ColorisId spécifique.
+        /// Récupère (get) toutes les photos (URLs) associées à un ProduitId et un ColorisId spécifique, 
+        /// ainsi que d'autres informations sur le produit.
         /// </summary>
         /// <param name="produitId">L'ID du produit</param>
         /// <param name="colorisId">L'ID du coloris</param>
         /// <returns>Réponse HTTP</returns>
-        /// <response code="200">Quand les URLs des photos ont été renvoyées avec succès</response>
+        /// <response code="200">Quand les URLs des photos et les informations du produit ont été renvoyées avec succès</response>
         /// <response code="204">Quand aucune photo n'est trouvée</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // GET: api/EstDeCouleurs/GetPhotosByCouleur/{produitId}/{colorisId}
+        /// GET: api/EstDeCouleurs/GetPhotosByCouleur/{produitId}/{colorisId}
         [HttpGet("GetPhotosByCouleur/{produitId}/{colorisId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<string>>> GetPhotosByCouleur(int produitId, int colorisId)
+        public async Task<ActionResult<IEnumerable<object>>> GetPhotosByCouleur(int produitId, int colorisId)
         {
             // Récupérer toutes les EstDeCouleur depuis le repository
             var result = await dataRepository.GetAllAsync();
@@ -280,19 +281,31 @@ namespace MilibooAPI.Controllers
                 return NoContent();
             }
 
-            // Récupérer et trier les URLs des photos
-            var photosUrls = filteredResult
+            // Récupérer et trier les informations nécessaires : URLs des photos, Description, Prixttc, Promotion, Nomproduit, Quantite
+            var photosInfos = filteredResult
                 .Select(x => new
                 {
-                    Codephoto = x.Codephoto,
-                    Url = GetPhotoUrl(x.Codephoto) // Utilisation de GetPhotoUrl
+                    // Informations sur la photo
+                    Url = GetPhotoUrl(x.Codephoto), // Utilisation de GetPhotoUrl
+                    Codephoto = x.Codephoto, // Codephoto pour le tri et la référence
+                    Description = x.Description,
+                    Prixttc = x.Prixttc,
+                    Promotion = x.Promotion,
+                    Nomproduit = x.Nomproduit,
+                    Quantite = x.Quantite
                 })
                 .Where(photo => photo.Url != null) // Supprimer les photos nulles
                 .OrderBy(photo => photo.Codephoto) // Tri par Codephoto croissant
-                .Select(photo => photo.Url) // Sélectionner uniquement l'URL après tri
                 .ToList();
 
-            return Ok(photosUrls);
+            // Si aucune photo n'est trouvée
+            if (!photosInfos.Any())
+            {
+                return NoContent();
+            }
+
+            // Retourner les informations sous forme d'objet
+            return Ok(photosInfos);
         }
 
         /// <summary>
