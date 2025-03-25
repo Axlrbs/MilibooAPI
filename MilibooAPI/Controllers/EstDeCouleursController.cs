@@ -281,21 +281,31 @@ namespace MilibooAPI.Controllers
                 return NoContent();
             }
 
-            // Récupérer et trier les informations nécessaires : URLs des photos, Description, Prixttc, Promotion, Nomproduit, Quantite
+            // Récupérer et trier les informations nécessaires : URLs des photos
             var photosInfos = filteredResult
-                .Select(x => new
+                .GroupBy(x => new { x.ProduitId, x.ColorisId })  // Regrouper par ProduitId et ColorisId
+                .Select(g => new
                 {
-                    // Informations sur la photo
-                    Url = GetPhotoUrl(x.Codephoto), // Utilisation de GetPhotoUrl
-                    Codephoto = x.Codephoto, // Codephoto pour le tri et la référence
-                    Description = x.Description,
-                    Prixttc = x.Prixttc,
-                    Promotion = x.Promotion,
-                    Nomproduit = x.Nomproduit,
-                    Quantite = x.Quantite
+                    // Informations générales du produit (renvoyées une seule fois)
+                    g.Key.ProduitId,
+                    g.Key.ColorisId,
+                    Description = g.First().Description,
+                    Prixttc = g.First().Prixttc,
+                    Promotion = g.First().Promotion,
+                    Nomproduit = g.First().Nomproduit,
+                    Quantite = g.First().Quantite,
+
+                    // URLs des photos associées au produit et au coloris
+                    PhotosUrls = g.Select(x => new
+                    {
+                        Url = GetPhotoUrl(x.Codephoto), // Utilisation de GetPhotoUrl
+                        Codephoto = x.Codephoto // Codephoto pour le tri et la référence
+                    })
+                    .Where(photo => photo.Url != null) // Supprimer les photos nulles
+                    .OrderBy(photo => photo.Codephoto) // Tri par Codephoto croissant
+                    .Select(photo => photo.Url) // Sélectionner uniquement l'URL après tri
+                    .ToList()
                 })
-                .Where(photo => photo.Url != null) // Supprimer les photos nulles
-                .OrderBy(photo => photo.Codephoto) // Tri par Codephoto croissant
                 .ToList();
 
             // Si aucune photo n'est trouvée
@@ -307,6 +317,7 @@ namespace MilibooAPI.Controllers
             // Retourner les informations sous forme d'objet
             return Ok(photosInfos);
         }
+
 
         /// <summary>
         /// Récupère (get) toutes les couleurs (Coloris) associées à un ProduitId spécifique.
