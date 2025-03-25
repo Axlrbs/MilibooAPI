@@ -2,11 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MilibooAPI.Models;
 using MilibooAPI.Models.EntityFramework;
 using MilibooAPI.Models.Repository;
+using System.Security.Claims;
 
 namespace MilibooAPI.Controllers
 {
@@ -183,6 +186,16 @@ namespace MilibooAPI.Controllers
             await dataRepository.DeleteAsync(client.Value);
 
             return NoContent();
+        }
+
+        [HttpGet]
+        [Authorize(Policy = Policies.Authorized)]
+        public async Task<ActionResult<Client>> GetClientData()
+        {
+            var userName = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var compte = await dataRepository.GetByStringAsync(userName);
+
+            return compte;
         }
 
         /*private bool ClientExists(int id)
