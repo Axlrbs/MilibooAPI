@@ -249,28 +249,31 @@ namespace MilibooAPI.Controllers
         }
 
         /// <summary>
-        /// Récupère (get) tous les IDColoris différents pour chaque ProduitId et leurs photos (URLs) associées
+        /// Récupère (get) tous les IDColoris différents pour un ProduitId spécifique et leurs photos (URLs) associées
         /// </summary>
+        /// <param name="produitId">L'ID du produit</param>
         /// <returns>Réponse HTTP</returns>
         /// <response code="200">Quand les IDColoris et URLs des photos ont été renvoyés avec succès</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // GET: api/EstDeCouleurs/GetPhotosByCouleur
-        [HttpGet("GetPhotosByCouleur")]
+        // GET: api/EstDeCouleurs/GetPhotosByCouleur/{produitId}
+        [HttpGet("GetPhotosByCouleur/{produitId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<object>>> GetPhotosByCouleur()
+        public async Task<ActionResult<IEnumerable<object>>> GetPhotosByCouleur(int produitId)
         {
-            // Récupérer toutes les EstDeCouleur
+            // Récupérer toutes les EstDeCouleur pour un ProduitId spécifique
             var result = await dataRepository.GetAllAsync();
 
-            // Assure-toi que la réponse contient des données
-            if (result.Value == null || !result.Value.Any())
+            // Assure-toi que la réponse contient des données et que le produitId existe
+            var filteredResult = result.Value?.Where(e => e.ProduitId == produitId).ToList();
+
+            if (filteredResult == null || !filteredResult.Any())
             {
                 return NoContent();
             }
 
-            // Récupérer les coloris uniques pour chaque produit
-            var photosByCouleur = result.Value
+            // Récupérer les coloris uniques pour chaque produit spécifique
+            var photosByCouleur = filteredResult
                 .GroupBy(e => new { e.ProduitId, e.ColorisId })  // Groupement par ProduitId et ColorisId
                 .Select(g => new
                 {
@@ -296,6 +299,7 @@ namespace MilibooAPI.Controllers
 
             return Ok(photosByCouleur);
         }
+
 
 
 
