@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace MilibooAPI.Models.EntityFramework
 {
@@ -20,8 +21,10 @@ namespace MilibooAPI.Models.EntityFramework
 
         [ForeignKey(nameof(CatIdCategorie))]
         [InverseProperty(nameof(InverseCatIdcategorieNavigation))]
+        [JsonIgnore]
         public virtual Categorie? CatIdcategorieNavigation { get; set; }
 
+        [JsonIgnore]
         [InverseProperty(nameof(CatIdcategorieNavigation))]
         public virtual ICollection<Categorie> InverseCatIdcategorieNavigation { get; set; } = new List<Categorie>();
 

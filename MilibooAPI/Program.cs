@@ -58,6 +58,10 @@ builder.Services.AddScoped<IDataRepository<Client>, ClientManager>();
 builder.Services.AddScoped<IDataRepository<Professionnel>, ProfessionnelManager>();
 builder.Services.AddScoped<IDataRepository<EstDeCouleur>, EstDeCouleurManager>();
 builder.Services.AddScoped<IDataRepository<AvisClient>, AvisClientManager>();
+builder.Services.AddScoped<IDataRepository<Categorie>, CategorieManager>();
+builder.Services.AddScoped<IDataRepository<TypeProduit>, TypeProduitManager>();
+builder.Services.AddScoped<IDataRepository<Produit>, ProduitManager>();
+builder.Services.AddScoped<IDataRepositoryClient<Client>, ClientManager>();
 
 // Configure DB context
 builder.Services.AddDbContext<MilibooDBContext>(options =>
