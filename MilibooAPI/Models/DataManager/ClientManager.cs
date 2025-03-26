@@ -5,7 +5,7 @@ using MilibooAPI.Models.Repository;
 
 namespace MilibooAPI.Models.DataManager
 {
-    public class ClientManager : IDataRepository<Client>,IDataRepositoryClient<Client>
+    public class ClientManager : IDataRepositoryClient
     {
         readonly MilibooDBContext? milibooContext;
         public ClientManager() { }
