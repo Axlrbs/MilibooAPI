@@ -29,7 +29,7 @@ namespace MilibooAPI.Controllers
         /// </summary>
         public ClientsController(IDataRepository<Client> dataRepo, IDataRepositoryClient<Client> dataRepoClient, ILogger<ClientsController> logger)
         {
-            dataRepository = dataRepo;
+            
             dataRepositoryClient = dataRepoClient;
             _logger = logger;  // Injection du logger
         }
@@ -50,7 +50,7 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Client>>> GetAllClients()
         {
-            return await dataRepository.GetAllAsync();
+            return await dataRepositoryClient.GetAllAsync();
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Client>> GetClientById(int id)
         {
-            var client = await dataRepository.GetByIdAsync(id);
+            var client = await dataRepositoryClient.GetByIdAsync(id);
 
             if (client == null)
             {
@@ -93,7 +93,7 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Client>> GetClientByNom(string nom)
         {
-            var client = await dataRepository.GetByStringAsync(nom);
+            var client = await dataRepositoryClient.GetByStringAsync(nom);
 
             if (client == null)
             {
@@ -156,14 +156,14 @@ namespace MilibooAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var userToUpdate = await dataRepository.GetByIdAsync(id);
+            var userToUpdate = await dataRepositoryClient.GetByIdAsync(id);
             if (userToUpdate == null)
             {
                 return NotFound();
             }
             else
             {
-                await dataRepository.UpdateAsync(userToUpdate.Value, client);
+                await dataRepositoryClient.UpdateAsync(userToUpdate.Value, client);
                 return NoContent();
             }
         }
@@ -250,14 +250,14 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteClient(int id)
         {
-            var client = await dataRepository.GetByIdAsync(id);
+            var client = await dataRepositoryClient.GetByIdAsync(id);
 
             if (client == null)
             {
                 return NotFound();
             }
 
-            await dataRepository.DeleteAsync(client.Value);
+            await dataRepositoryClient.DeleteAsync(client.Value);
 
             return NoContent();
         }

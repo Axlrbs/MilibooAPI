@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MilibooAPI.Models.EntityFramework;
 
 namespace MilibooAPI.Models.Repository
 {
-    public interface IDataRepositoryClient<TEntity>
+    public interface IDataRepositoryClient : IDataRepository<Client>
     {
-        Task<ActionResult<TEntity>> GetByStringBisAsync(string str);
+        Task<ActionResult<Client>> GetByStringBisAsync(string str);
     }
 }
