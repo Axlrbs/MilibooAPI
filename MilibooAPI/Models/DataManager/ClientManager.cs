@@ -5,7 +5,7 @@ using MilibooAPI.Models.Repository;
 
 namespace MilibooAPI.Models.DataManager
 {
-    public class ClientManager : IDataRepository<Client>
+    public class ClientManager : IDataRepository<Client>,IDataRepositoryClient<Client>
     {
         readonly MilibooDBContext? milibooContext;
         public ClientManager() { }
@@ -25,6 +25,11 @@ namespace MilibooAPI.Models.DataManager
         {
             return await milibooContext.Clients.FirstOrDefaultAsync(u => u.NomPersonne.ToUpper() == nom.ToUpper());
         }
+        public async Task<ActionResult<Client>> GetByStringBisAsync(string email)
+        {
+            return await milibooContext.Clients.FirstOrDefaultAsync(u => u.EmailClient.ToUpper() == email.ToUpper());
+        }
+
         public async Task AddAsync(Client entity)
         {
             await milibooContext.Clients.AddAsync(entity);
@@ -52,5 +57,7 @@ namespace MilibooAPI.Models.DataManager
             milibooContext.Clients.Remove(client);
             await milibooContext.SaveChangesAsync();
         }
+
+        
     }
 }

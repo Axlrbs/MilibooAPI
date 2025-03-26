@@ -19,13 +19,15 @@ namespace MilibooAPI.Controllers
     {
         //private readonly MilibooContext _context;
         private readonly IDataRepository<Client> dataRepository;
+        private readonly IDataRepositoryClient<Client> dataRepositoryClient;
 
         /// <summary>
         /// Constructeur du controller
         /// </summary>
-        public ClientsController(IDataRepository<Client> dataRepo)
+        public ClientsController(IDataRepository<Client> dataRepo, IDataRepositoryClient<Client> dataRepoClient)
         {
             dataRepository = dataRepo;
+            dataRepositoryClient = dataRepoClient;
         }
         /*public ClientsController(MilibooContext context)
         {
@@ -88,6 +90,31 @@ namespace MilibooAPI.Controllers
         public async Task<ActionResult<Client>> GetClientByNom(string nom)
         {
             var client = await dataRepository.GetByStringAsync(nom);
+
+            if (client == null)
+            {
+                return NotFound();
+            }
+
+            return client;
+        }
+
+        /// <summary>
+        /// Récupère (get) un client par son email
+        /// </summary>
+        /// <param name="email">Le email du client</param>
+        /// <returns>Réponse http</returns>
+        /// <response code="200">Quand le client a été trouvé</response>
+        /// <response code="404">Quand le client n'a pas été trouvé</response>
+        /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        // GET: api/Clients/GetClientByNom/{email}
+        [HttpGet("[action]/{email}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Client>> GetClientByEmail(string email)
+        {
+            var client = await dataRepositoryClient.GetByStringBisAsync(email);
 
             if (client == null)
             {
