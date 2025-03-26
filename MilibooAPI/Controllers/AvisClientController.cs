@@ -39,7 +39,7 @@ namespace MilibooAPI.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<AvisClient>>> GetAvisClients()
+        public async Task<ActionResult<IEnumerable<AvisClient>>> GetAllAvisClients()
         {
             return await dataRepository.GetAllAsync();
 
@@ -74,7 +74,7 @@ namespace MilibooAPI.Controllers
         /// Modifie (put) un avis client
         /// </summary>
         /// <param name="id">L'id de l'avis client à modifier</param>
-        /// <param name="client">L'avis client modifié</param>
+        /// <param name="avisClient">L'avis client modifié</param>
         /// <returns>Réponse http</returns>
         /// <response code="204">Quand l'avis client a été modifié avec succès</response>
         /// <response code="400">Quand l'id ne correspond pas ou que le format de 'l'avis client est incorrect</response>
