@@ -188,6 +188,7 @@ namespace MilibooAPI.Controllers
             return NoContent();
         }
 
+        /*
         [HttpGet]
         [Authorize(Policy = Policies.Authorized)]
         public async Task<ActionResult<Client>> GetClientData()
@@ -197,6 +198,7 @@ namespace MilibooAPI.Controllers
 
             return compte;
         }
+        */
 
         /*private bool ClientExists(int id)
         {

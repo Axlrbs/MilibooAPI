@@ -53,6 +53,8 @@ namespace MilibooAPI.Controllers
             return _dbContext.Clients.SingleOrDefault(x => x.NomPersonne.ToLower() == login.NomPersonne.ToLower() && x.MdpClient == login.MdpClient); //Vérifier si mdp hash dans la base    
         }
 
+
+
         private string GenerateJwtToken(ClientDTO login)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:SecretKey"]));
