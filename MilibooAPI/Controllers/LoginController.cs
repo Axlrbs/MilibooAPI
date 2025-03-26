@@ -12,7 +12,7 @@ namespace MilibooAPI.Controllers
 {
     public class ClientDTO
     {
-        public string NomPersonne { get; set; }
+        public string EmailClient { get; set; }
         public string MdpClient { get; set; }
     }
 
@@ -25,7 +25,8 @@ namespace MilibooAPI.Controllers
         private readonly IConfiguration _config;
 
 
-        public LoginController(MilibooDBContext milibooDbContext, IConfiguration config) {
+        public LoginController(MilibooDBContext milibooDbContext, IConfiguration config)
+        {
             _dbContext = milibooDbContext;
             _config = config;
         }
@@ -50,9 +51,8 @@ namespace MilibooAPI.Controllers
 
         private Client AuthenticateClient(ClientDTO login)
         {
-            return _dbContext.Clients.SingleOrDefault(x => x.NomPersonne.ToLower() == login.NomPersonne.ToLower() && x.MdpClient == login.MdpClient); //Vérifier si mdp hash dans la base    
+            return _dbContext.Clients.SingleOrDefault(x => x.EmailClient.ToLower() == login.EmailClient.ToLower() && x.MdpClient == login.MdpClient); //Vérifier si mdp hash dans la base    
         }
-
 
 
         private string GenerateJwtToken(ClientDTO login)
@@ -61,7 +61,7 @@ namespace MilibooAPI.Controllers
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             var claims = new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, login.NomPersonne),
+                new Claim(ClaimTypes.NameIdentifier, login.EmailClient),
                 new Claim("role", "Authorized"),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             }; //Info a passer
