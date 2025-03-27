@@ -10,8 +10,6 @@ using MilibooAPI.Models;
 using MilibooAPI.Models.EntityFramework;
 using MilibooAPI.Models.Repository;
 using System.Security.Claims;
-using System.ComponentModel.DataAnnotations;
-
 
 namespace MilibooAPI.Controllers
 {
@@ -20,18 +18,16 @@ namespace MilibooAPI.Controllers
     public class ClientsController : ControllerBase
     {
         //private readonly MilibooContext _context;
-        private readonly IDataRepository<Client> dataRepository;
-        private readonly IDataRepositoryClient<Client> dataRepositoryClient;
-        private readonly ILogger<ClientsController> _logger;
+        //private readonly IDataRepository<Client> dataRepository;
+        private readonly IDataRepositoryClient dataRepositoryClient;
 
         /// <summary>
         /// Constructeur du controller
         /// </summary>
-        public ClientsController(IDataRepository<Client> dataRepo, IDataRepositoryClient<Client> dataRepoClient, ILogger<ClientsController> logger)
+        public ClientsController(IDataRepositoryClient dataRepoClient)
         {
-            
+
             dataRepositoryClient = dataRepoClient;
-            _logger = logger;  // Injection du logger
         }
         /*public ClientsController(MilibooContext context)
         {
@@ -171,69 +167,26 @@ namespace MilibooAPI.Controllers
         /// <summary>
         /// Crée (post) un nouveau client
         /// </summary>
-        /// <param name="clientDTO">Le client à créer</param>
+        /// <param name="client">Le client à créer</param>
         /// <returns>Réponse http</returns>
         /// <response code="201">Quand le client a été créé avec succès</response>
         /// <response code="400">Quand le format du client dans le corps de la requête est incorrect</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        // POST: api/Clients/PostClient
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Client>> PostClient([FromBody] CreateClientDTO clientDTO)
+        public async Task<ActionResult<Client>> PostClient(Client client)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                // Validation des données reçues
-                if (string.IsNullOrEmpty(clientDTO.NomPersonne) || string.IsNullOrEmpty(clientDTO.PrenomPersonne) ||
-                    string.IsNullOrEmpty(clientDTO.TelPersonne) || string.IsNullOrEmpty(clientDTO.EmailClient) ||
-                    string.IsNullOrEmpty(clientDTO.MdpClient))
-                {
-                    _logger.LogWarning("Les champs obligatoires sont manquants.");
-                    return BadRequest("Tous les champs sont obligatoires.");
-                }
-
-                // Validation de l'email
-                if (!new EmailAddressAttribute().IsValid(clientDTO.EmailClient))
-                {
-                    _logger.LogWarning($"L'email fourni est invalide : {clientDTO.EmailClient}");
-                    return BadRequest("L'email fourni est invalide.");
-                }
-
-                // Créer un nouveau client avec les données du DTO
-                var newClient = new Client
-                {
-                    NomPersonne = clientDTO.NomPersonne,
-                    PrenomPersonne = clientDTO.PrenomPersonne,
-                    TelPersonne = clientDTO.TelPersonne,
-                    EmailClient = clientDTO.EmailClient,
-                    MdpClient = clientDTO.MdpClient, // Assurez-vous de crypter le mot de passe avant de l'enregistrer
-                    NbTotalPointsFidelite = 0,
-                    MoyenneAvis = 0,
-                    NombreAvisDepose = 0,
-                    IsVerified = false,
-                    DateDerniereUtilisation = DateTime.UtcNow,
-                    DateAnonymisation = DateTime.UtcNow
-                };
-
-                _logger.LogInformation($"Création d'un nouveau client : {newClient.EmailClient}");
-
-                // Ajouter le client dans la base de données
-                await dataRepository.AddAsync(newClient);
-
-                _logger.LogInformation($"Client créé avec succès : {newClient.ClientId}");
-
-                return CreatedAtAction("GetClientById", new { id = newClient.ClientId }, newClient);
+                return BadRequest(ModelState);
             }
-            catch (Exception ex)
-            {
-                // Log de l'erreur si quelque chose échoue
-                _logger.LogError($"Erreur lors de la création du client : {ex.Message}", ex);
-                return StatusCode(StatusCodes.Status500InternalServerError, "Une erreur s'est produite lors de la création du client.");
-            }
+            await dataRepositoryClient.AddAsync(client);
+
+            return CreatedAtAction("GetClientById", new { id = client.ClientId }, client);
         }
-
-
 
         /// <summary>
         /// Supprime (delete) un client
