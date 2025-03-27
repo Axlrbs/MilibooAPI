@@ -15,14 +15,14 @@ namespace MilibooAPI.Controllers
     public class CategorieController : ControllerBase
     {
         //private readonly MilibooContext _context;
-        private readonly IDataRepository<Categorie> dataRepository;
+        private readonly IDataRepositoryCategorie dataRepositoryCategorie;
 
         /// <summary>
         /// Constructeur du controller
         /// </summary>
-        public CategorieController(IDataRepository<Categorie> dataRepo)
+        public CategorieController(IDataRepositoryCategorie dataRepoCategorie)
         {
-            dataRepository = dataRepo;
+            dataRepositoryCategorie = dataRepoCategorie;
         }
         /*public CategorieController(MilibooDBContext context)
         {
@@ -41,7 +41,7 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Categorie>>> GetAllCategories()
         {
-            return await dataRepository.GetAllAsync();
+            return await dataRepositoryCategorie.GetAllAsync();
 
         }
 
@@ -53,14 +53,14 @@ namespace MilibooAPI.Controllers
         /// <response code="200">Quand la catégorie a été trouvée</response>
         /// <response code="404">Quand la catégorie n'a pas été trouvée</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // GET: api/Categories/5
+        // GET: api/Categories/3
         [HttpGet("[action]/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Categorie>> GetCategorieById(int id)
         {
-            var categorie = await dataRepository.GetByIdAsync(id);
+            var categorie = await dataRepositoryCategorie.GetByIdAsync(id);
 
             if (categorie == null)
             {
@@ -68,6 +68,56 @@ namespace MilibooAPI.Controllers
             }
 
             return categorie;
+        }
+
+        /// <summary>
+        /// Récupère (get) les produits d'une catégorie par son ID
+        /// </summary>
+        /// <param name="id">L'id de la catégorie</param>
+        /// <returns>Réponse http</returns>
+        /// <response code="200">Quand la catégorie a été trouvée</response>
+        /// <response code="404">Quand la catégorie n'a pas été trouvée</response>
+        /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        // GET: api/Categories/5
+        [HttpGet("[action]/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Categorie>> GetProduitsByIdCategorie(int id)
+        {
+            var produits = await dataRepositoryCategorie.GetProduitsByIdCategorieAsync(id);
+
+            if (produits == null)
+            {
+                return NotFound();
+            }
+
+            return produits;
+        }
+
+        /// <summary>
+        /// Récupère (get) une photo par son code
+        /// </summary>
+        /// <param name="codePhoto>Le code de la photo</param>
+        /// <returns>Réponse http</returns>
+        /// <response code="200">Quand la photo a été trouvée</response>
+        /// <response code="404">Quand la photo n'a pas été trouvée</response>
+        /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        // GET: api/Categories/8
+        [HttpGet("[action]/{codePhoto}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Photo>> GetFirstPhotoByCode(string codePhoto)
+        {
+            var photo = await dataRepositoryCategorie.GetFirstPhotoByCodeAsync(codePhoto);
+
+            if (photo == null)
+            {
+                return NotFound();
+            }
+
+            return photo;
         }
 
         /// <summary>
@@ -85,7 +135,7 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Categorie>> GetCategorieByNom(string nom)
         {
-            var categorie = await dataRepository.GetByStringAsync(nom);
+            var categorie = await dataRepositoryCategorie.GetByStringAsync(nom);
 
             if (categorie == null)
             {
@@ -124,14 +174,14 @@ namespace MilibooAPI.Controllers
                 return BadRequest(ModelState);
             }
 
-            var opinionToUpdate = await dataRepository.GetByIdAsync(id);
+            var opinionToUpdate = await dataRepositoryCategorie.GetByIdAsync(id);
             if (opinionToUpdate == null)
             {
                 return NotFound();
             }
             else
             {
-                await dataRepository.UpdateAsync(opinionToUpdate.Value, categorie);
+                await dataRepositoryCategorie.UpdateAsync(opinionToUpdate.Value, categorie);
                 return NoContent();
             }
         }
@@ -156,7 +206,7 @@ namespace MilibooAPI.Controllers
             {
                 return BadRequest(ModelState);
             }
-            await dataRepository.AddAsync(categorie);
+            await dataRepositoryCategorie.AddAsync(categorie);
 
             return CreatedAtAction("GetCategorieById", new { id = categorie.CategorieId }, categorie);
         }
@@ -177,14 +227,14 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteCategorie(int id)
         {
-            var categorie = await dataRepository.GetByIdAsync(id);
+            var categorie = await dataRepositoryCategorie.GetByIdAsync(id);
 
             if (categorie == null)
             {
                 return NotFound();
             }
 
-            await dataRepository.DeleteAsync(categorie.Value);
+            await dataRepositoryCategorie.DeleteAsync(categorie.Value);
 
             return NoContent();
         }

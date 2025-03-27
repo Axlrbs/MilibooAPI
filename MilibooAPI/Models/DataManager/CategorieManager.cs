@@ -6,7 +6,7 @@ using MilibooAPI.Models.Repository;
 
 namespace MilibooAPI.Models.DataManager
 {
-    public class CategorieManager : IDataRepository<Categorie>
+    public class CategorieManager : IDataRepositoryCategorie
     {
         readonly MilibooDBContext? milibooContext;
         public CategorieManager() { }
@@ -22,6 +22,17 @@ namespace MilibooAPI.Models.DataManager
         {
             return await milibooContext.Categories.FirstOrDefaultAsync(u => u.CategorieId == id);
         }
+
+        public async Task<ActionResult<Categorie>> GetProduitsByIdCategorieAsync(int id)
+        {
+            return await milibooContext.Categories.Include(a => a.ACommes).ThenInclude(b => b.IdproduitNavigation).ThenInclude(c => c.EstDeCouleurs).FirstOrDefaultAsync(u => u.CategorieId == id);
+        }
+
+        public async Task<ActionResult<Photo>> GetFirstPhotoByCodeAsync(string codePhoto)
+        {
+            return await milibooContext.Photos.FirstOrDefaultAsync(u => u.CodePhoto == codePhoto);
+        }
+
         public async Task<ActionResult<Categorie>> GetByStringAsync(string nom)
         {
             return await milibooContext.Categories.FirstOrDefaultAsync(u => u.NomCategorie.ToUpper() == nom.ToUpper());
