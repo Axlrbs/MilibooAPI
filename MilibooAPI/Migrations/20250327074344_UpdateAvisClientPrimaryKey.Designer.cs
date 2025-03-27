@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MilibooAPI.Models.EntityFramework;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MilibooAPI.Migrations
 {
     [DbContext(typeof(MilibooDBContext))]
-    partial class MilibooDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250327074344_UpdateAvisClientPrimaryKey")]
+    partial class UpdateAvisClientPrimaryKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,7 +158,7 @@ namespace MilibooAPI.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("avc_idavis");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityAlwaysColumn(b.Property<int>("AvisId"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("AvisId"));
 
                     b.Property<int>("ClientId")
                         .HasColumnType("integer")
@@ -165,7 +168,7 @@ namespace MilibooAPI.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("avc_dateavis")
-                        .HasDefaultValueSql("NOW()");
+                        .HasDefaultValueSql("now()");
 
                     b.Property<string>("DescriptionAvis")
                         .HasColumnType("varchar(300)")
@@ -193,6 +196,8 @@ namespace MilibooAPI.Migrations
                     b.HasIndex("ClientId");
 
                     b.HasIndex("ProduitId");
+
+                    b.HasIndex(new[] { "TitreAvis" }, "uqix_avisclient_titreavis");
 
                     b.ToTable("t_e_avis_client_avc", "miliboo");
                 });

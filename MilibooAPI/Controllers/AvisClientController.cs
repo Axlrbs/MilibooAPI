@@ -17,12 +17,13 @@ namespace MilibooAPI.Controllers
         //private readonly MilibooContext _context;
         private readonly IDataRepository<AvisClient> dataRepository;
 
+        private readonly MilibooDBContext _context;
         /// <summary>
         /// Constructeur du controller
         /// </summary>
-        public AvisClientController(IDataRepository<AvisClient> dataRepo)
+        public AvisClientController(MilibooDBContext context)
         {
-            dataRepository = dataRepo;
+            _context = context;
         }
         /*public AvisClientController(MilibooDBContext context)
         {
@@ -58,17 +59,20 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<AvisClient>> GetAllAvisClientByProduitId(int id)
+        public async Task<ActionResult<IEnumerable<AvisClient>>> GetAllAvisClientByProduitId(int id)
         {
-            var avisClient = await dataRepository.GetByIdAsync(id);
+            var avisClients = await _context.AvisClients
+                                            .Where(a => a.ProduitId == id)
+                                            .ToListAsync();
 
-            if (avisClient == null)
+            if (avisClients == null || avisClients.Count == 0)
             {
-                return NotFound();
+                return NotFound($"Aucun avis trouvé pour le produit avec l'ID {id}.");
             }
 
-            return avisClient;
+            return Ok(avisClients);
         }
+
 
         /// <summary>
         /// Modifie (put) un avis client
@@ -110,30 +114,92 @@ namespace MilibooAPI.Controllers
                 return NoContent();
             }
         }
-
         /// <summary>
-        /// Crée (post) un nouvel avis client
+        /// Récupère un avis client par son ID
         /// </summary>
-        /// <param name="avisClient">L'avis client à créer</param>
-        /// <returns>Réponse http</returns>
-        /// <response code="201">Quand l'avis client a été créé avec succès</response>
-        /// <response code="400">Quand le format de l'avis client dans le corps de la requête est incorrect</response>
-        /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // POST: api/AvisClient
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<AvisClient>> PostAvisClient(AvisClient avisClient)
+        /// <param name="id">ID de l'avis client</param>
+        [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<AvisClient>> GetAvisClientById(int id)
         {
+            var avisClient = await _context.AvisClients
+                .Include(a => a.IdclientNavigation)
+                .Include(a => a.IdproduitNavigation)
+                .FirstOrDefaultAsync(a => a.AvisId == id);
+
+            if (avisClient == null)
+            {
+                return NotFound($"Avis client avec l'ID {id} non trouvé.");
+            }
+
+            return Ok(avisClient);
+        }
+
+
+        [HttpPost]
+        public async Task<ActionResult<AvisClient>> PostAvisClient(AvisClientDto avisClientDto)
+        {
+            // Validate input
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            await dataRepository.AddAsync(avisClient);
 
-            return CreatedAtAction("GetAvisClientById", new { id = avisClient.AvisId }, avisClient);
+            // Verify client exists
+            var clientExists = await _context.Clients.AnyAsync(c => c.ClientId == avisClientDto.ClientId);
+            if (!clientExists)
+            {
+                return BadRequest($"Client with ID {avisClientDto.ClientId} not found.");
+            }
+
+            // Verify product exists
+            var productExists = await _context.Produits.AnyAsync(p => p.ProduitId == avisClientDto.ProduitId);
+            if (!productExists)
+            {
+                return BadRequest($"Product with ID {avisClientDto.ProduitId} not found.");
+            }
+
+            // Additional validations
+            if (avisClientDto.NoteAvis.HasValue && (avisClientDto.NoteAvis < 1 || avisClientDto.NoteAvis > 5))
+            {
+                return BadRequest("Rating must be between 1 and 5.");
+            }
+
+            // Create new AvisClient
+            var avisClient = new AvisClient
+            {
+                // Explicitly do NOT set AvisId
+                ClientId = avisClientDto.ClientId,
+                ProduitId = avisClientDto.ProduitId,
+                DescriptionAvis = avisClientDto.DescriptionAvis,
+                NoteAvis = avisClientDto.NoteAvis,
+                TitreAvis = avisClientDto.TitreAvis,
+                DateAvis = DateTime.UtcNow
+            };
+
+            try
+            {
+                // Explicitly detach any tracked entities with the same key
+                var existingEntry = _context.ChangeTracker.Entries<AvisClient>()
+                    .FirstOrDefault(e => e.Entity.AvisId == avisClient.AvisId);
+
+                if (existingEntry != null)
+                {
+                    _context.Entry(existingEntry.Entity).State = EntityState.Detached;
+                }
+
+                // Add and save
+                _context.AvisClients.Add(avisClient);
+                await _context.SaveChangesAsync();
+
+                return CreatedAtAction(nameof(GetAvisClientById), new { id = avisClient.AvisId }, avisClient);
+            }
+            catch (DbUpdateException ex)
+            {
+                // Log the full exception details
+                return StatusCode(500, "An error occurred while saving the review.");
+            }
         }
 
         /// <summary>
