@@ -143,20 +143,30 @@ namespace MilibooAPI.Models.EntityFramework
 
             modelBuilder.Entity<AvisClient>(entity =>
             {
+                // Explicitly configure primary key
                 entity.HasKey(e => e.AvisId)
                     .HasName("pk_avc");
-                entity.Property(e => e.DateAvis).HasDefaultValueSql("now()");
 
+                // Ensure identity generation
+                entity.Property(e => e.AvisId)
+                    .UseIdentityAlwaysColumn(); // PostgreSQL-specific identity column
+
+                // Default value for DateAvis
+                entity.Property(e => e.DateAvis)
+                    .HasDefaultValueSql("NOW()");
+
+                // Foreign key relationships
                 entity.HasOne(d => d.IdproduitNavigation)
                     .WithMany(p => p.AvisClients)
+                    .HasForeignKey(d => d.ProduitId)
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("fk_avc_prd");
 
                 entity.HasOne(d => d.IdclientNavigation)
                     .WithMany(p => p.AvisClients)
+                    .HasForeignKey(d => d.ClientId)
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("fk_avc_clt");
-
             });
 
             modelBuilder.Entity<Boutique>(entity =>

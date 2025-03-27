@@ -6,6 +6,7 @@ using MilibooAPI.Models.DataManager;
 using MilibooAPI.Models.EntityFramework;
 using MilibooAPI.Models.Repository;
 using System.Text;
+using System.Text.Json.Serialization;
 using static MilibooAPI.Models.EntityFramework.MilibooDBContext;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,12 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
