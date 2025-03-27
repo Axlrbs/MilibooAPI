@@ -39,10 +39,10 @@ namespace MilibooAPI.Models.EntityFramework
         [Column("clt_is_verified")]
         public bool IsVerified { get; set; } = false;
 
-        [Column("clt_datederniereutilisation", TypeName = "timestamp without time zone")]
+        [Column("clt_datederniereutilisation")]
         public DateTime DateDerniereUtilisation { get; set; } = DateTime.UtcNow;
 
-        [Column("clt_dateanonymisation", TypeName = "timestamp without time zone")]
+        [Column("clt_dateanonymisation")]
         public DateTime? DateAnonymisation { get; set; } = DateTime.UtcNow;
 
         [InverseProperty(nameof(APour.IdClientNavigation))]

@@ -177,15 +177,25 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Client>> PostClient(Client client)
+        public async Task<ActionResult<Client>> PostClient(CreateClientDTO clientDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
+            var client = new Client
+            {
+                PrenomPersonne = clientDTO.PrenomPersonne,
+                NomPersonne = clientDTO.NomPersonne,
+                TelPersonne = clientDTO.TelPersonne,
+                EmailClient = clientDTO.EmailClient,
+                MdpClient = clientDTO.MdpClient
+            };
+
             await dataRepositoryClient.AddAsync(client);
 
-            return CreatedAtAction("GetClientById", new { id = client.ClientId }, client);
+            return CreatedAtAction(nameof(GetClientById), new { id = client.ClientId }, client);
         }
 
         /// <summary>
