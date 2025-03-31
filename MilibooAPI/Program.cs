@@ -69,6 +69,7 @@ builder.Services.AddScoped<IDataRepository<TypeProduit>, TypeProduitManager>();
 builder.Services.AddScoped<IDataRepository<Produit>, ProduitManager>();
 builder.Services.AddScoped<IDataRepositoryClient, ClientManager>();
 builder.Services.AddScoped<IDataRepositoryCommande, CommandeManager>();
+builder.Services.AddScoped<IDataRepositoryEstDeCouleur, EstDeCouleurManager>();
 
 // Configure DB context
 builder.Services.AddDbContext<MilibooDBContext>(options =>

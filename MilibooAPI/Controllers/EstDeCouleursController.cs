@@ -14,13 +14,13 @@ namespace MilibooAPI.Controllers
     [ApiController]
     public class EstDeCouleursController : ControllerBase
     {
-        private readonly IDataRepository<EstDeCouleur> dataRepository;
+        private readonly IDataRepositoryEstDeCouleur dataRepository;
         private readonly MilibooDBContext _context; // Ajout du contexte pour pouvoir faire des requêtes plus complexes
 
         /// <summary>
         /// Constructeur du controller
         /// </summary>
-        public EstDeCouleursController(IDataRepository<EstDeCouleur> dataRepo, MilibooDBContext context)
+        public EstDeCouleursController(IDataRepositoryEstDeCouleur dataRepo, MilibooDBContext context)
         {
             dataRepository = dataRepo;
             _context = context;
@@ -333,23 +333,14 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<object>>> GetCouleursByProduit(int produitId)
         {
-            var result = await _context.EstDeCouleurs
-                .Where(e => e.ProduitId == produitId)
-                .Include(e => e.IdcolorisNavigation) // Jointure avec Coloris
-                .Select(e => new
-                {
-                    e.ColorisId,
-                    LibelleColoris = e.IdcolorisNavigation.LibelleColoris
-                })
-                .Distinct()
-                .ToListAsync();
+            var result = await dataRepository.GetCouleursByProduit(produitId);
 
-            if (result == null || !result.Any())
+            if (result.Result is NotFoundResult)
             {
                 return NotFound();
             }
 
-            return Ok(result);
+            return Ok(result.Value);
         }
 
 

@@ -5,7 +5,7 @@ using MilibooAPI.Models.Repository;
 
 namespace MilibooAPI.Models.DataManager
 {
-    public class EstDeCouleurManager: IDataRepository<EstDeCouleur>
+    public class EstDeCouleurManager: IDataRepositoryEstDeCouleur
     {
         readonly MilibooDBContext? milibooContext;
         public EstDeCouleurManager() { }
@@ -15,7 +15,7 @@ namespace MilibooAPI.Models.DataManager
         }
         public async Task<ActionResult<IEnumerable<EstDeCouleur>>> GetAllAsync()
         {
-            return milibooContext.EstDeCouleurs.ToList();
+            return await milibooContext.EstDeCouleurs.ToListAsync();
         }
         public async Task<ActionResult<EstDeCouleur>> GetByIdAsync(int id)
         {
@@ -25,6 +25,26 @@ namespace MilibooAPI.Models.DataManager
         {
             return await milibooContext.EstDeCouleurs.FirstOrDefaultAsync(u => u.Nomproduit.ToUpper() == nom.ToUpper());
         }
+
+        public async Task<ActionResult<IEnumerable<object>>> GetCouleursByProduit(int produitId)
+        {
+            return await milibooContext.EstDeCouleurs
+                .Include(e => e.IdcolorisNavigation)  
+                .Where(e => e.ProduitId == produitId) 
+                .Select(e => new
+                {
+                    e.ColorisId,      
+                    LibelleColoris = e.IdcolorisNavigation.LibelleColoris, 
+                })
+                .Distinct()
+                .ToListAsync(); 
+
+            
+        }
+
+
+
+
         public async Task AddAsync(EstDeCouleur entity)
         {
             await milibooContext.EstDeCouleurs.AddAsync(entity);
