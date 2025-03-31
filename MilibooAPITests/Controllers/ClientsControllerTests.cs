@@ -229,7 +229,7 @@ namespace MilibooAPI.Controllers.Tests
             CreateClientDTO dernierClientEnDTO = new CreateClientDTO()
             {
                 NomPersonne = clientRecupere.NomPersonne,
-                PrenomPersonne = clientRecupere.PrenomPersonne,
+                PrenomPersonne = clientRecupere.PrenomPersonne, 
                 TelPersonne = clientRecupere.TelPersonne,
                 EmailClient = clientRecupere.EmailClient,
                 MdpClient = clientRecupere.MdpClient
