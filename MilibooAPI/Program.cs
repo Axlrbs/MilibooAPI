@@ -19,7 +19,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVueApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:8978")
+        policy.WithOrigins("http://localhost:5173", "http://localhost:8978", "http://localhost:8950")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials(); 
@@ -70,6 +70,7 @@ builder.Services.AddScoped<IDataRepository<Produit>, ProduitManager>();
 builder.Services.AddScoped<IDataRepositoryClient, ClientManager>();
 builder.Services.AddScoped<IDataRepositoryCommande, CommandeManager>();
 builder.Services.AddScoped<IDataRepositoryEstDeCouleur, EstDeCouleurManager>();
+builder.Services.AddScoped<IDataRepositoryAvisClient, AvisClientManager>();
 
 // Configure DB context
 builder.Services.AddDbContext<MilibooDBContext>(options =>
