@@ -34,7 +34,7 @@ namespace MilibooAPI.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<TypePaiement>>> GetTypePaiements()
+        public async Task<ActionResult<IEnumerable<TypePaiement>>> GetAllTypePaiements()
         {
             return await dataRepository.GetAllAsync();
         }
@@ -55,6 +55,31 @@ namespace MilibooAPI.Controllers
         public async Task<ActionResult<TypePaiement>> GetTypePaiementById(int id)
         {
             var typePaiement = await dataRepository.GetByIdAsync(id);
+
+            if (typePaiement == null)
+            {
+                return NotFound();
+            }
+
+            return typePaiement;
+        }
+
+        /// <summary>
+        /// Récupère (get) un type paiement par son libelle
+        /// </summary>
+        /// <param name="libelle">Le libelle du type de paiement</param>
+        /// <returns>Réponse http</returns>
+        /// <response code="200">Quand le libelle a été trouvée</response>
+        /// <response code="404">Quand le libelle n'a pas été trouvée</response>
+        /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        // GET: api/TypePaiements/GetTypePaiementByLibelle/{libelle}
+        [HttpGet("[action]/{libelle}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<TypePaiement>> GetTypePaiementByLibelle(string libelle)
+        {
+            var typePaiement = await dataRepository.GetByStringAsync(libelle);
 
             if (typePaiement == null)
             {

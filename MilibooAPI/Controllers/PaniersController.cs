@@ -33,7 +33,7 @@ namespace MilibooAPI.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<Panier>>> GetPaniers()
+        public async Task<ActionResult<IEnumerable<Panier>>> GetAllPaniers()
         {
             return await dataRepository.GetAllAsync();
         }
@@ -52,7 +52,7 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Panier>> GetPanier(int clientId)
+        public async Task<ActionResult<Panier>> GetPanierByIdClient(int clientId)
         {
             var panier = await dataRepository.GetByIdAsync(clientId);  
 
@@ -131,7 +131,7 @@ namespace MilibooAPI.Controllers
             await dataRepository.AddAsync(panier);  // Ajoute le panier via ton DataRepository
 
             // Renvoie un code 201 et l'URL de l'action pour récupérer ce panier
-            return CreatedAtAction(nameof(GetPanier), new { clientId = panier.ClientId }, panier);
+            return CreatedAtAction(nameof(GetPanierByIdClient), new { clientId = panier.ClientId }, panier);
         }
 
 
