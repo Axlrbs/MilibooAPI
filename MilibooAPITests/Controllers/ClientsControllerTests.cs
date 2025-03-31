@@ -15,6 +15,8 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Microsoft.AspNetCore.Mvc;
 using MilibooAPI.Models.DataManager;
+using MilibooAPI.Models;
+using System.Text.Json;
 
 namespace MilibooAPI.Controllers.Tests
 {
@@ -27,9 +29,9 @@ namespace MilibooAPI.Controllers.Tests
     {
         private MilibooDBContext context;
         private ClientsController controller;
-        private IDataRepository<Client> dataRepository;
+        private IDataRepositoryClient dataRepository;
 
-        private Mock<IDataRepository<Client>> mockRepository;
+        private Mock<IDataRepositoryClient> mockRepository;
         private ClientsController controllerMoq;
 
         [TestInitialize]
@@ -41,7 +43,7 @@ namespace MilibooAPI.Controllers.Tests
             dataRepository = new ClientManager(context);
             controller = new (dataRepository);
 
-            mockRepository = new Mock<IDataRepository<Client>>();
+            mockRepository = new Mock<IDataRepositoryClient>();
             controllerMoq = new ClientsController(mockRepository.Object);
         }
 
@@ -121,7 +123,7 @@ namespace MilibooAPI.Controllers.Tests
         [TestMethod]
         public void GetClientById_UnknownIdPassed_ReturnsNotFoundResult_Moq()
         {
-            var mockRepository = new Mock<IDataRepository<Client>>();
+            var mockRepository = new Mock<IDataRepositoryClient>();
             var clientController = new ClientsController(mockRepository.Object);
 
             // Act
@@ -182,7 +184,7 @@ namespace MilibooAPI.Controllers.Tests
         [TestMethod]
         public void GetClientByNom_UnknownNomPassed_ReturnsNotFoundResult_Moq()
         {
-            var mockRepository = new Mock<IDataRepository<Client>>();
+            var mockRepository = new Mock<IDataRepositoryClient>();
             var clientController = new ClientsController(mockRepository.Object);
 
             // Act
@@ -199,20 +201,13 @@ namespace MilibooAPI.Controllers.Tests
             Random rnd = new Random();
             int chiffre = rnd.Next(1, 1000000000);
 
-            Client clientATester = new Client()
+            CreateClientDTO clientATester = new CreateClientDTO()
             {
-                ClientId = 78,
                 NomPersonne = "Berthet",
                 PrenomPersonne = "Mano",
                 TelPersonne = "0626910251",
                 EmailClient = "mano.berthet@etu.univ-smb.fr",
-                MdpClient = "IXT75PFE6LC!",
-                NbTotalPointsFidelite = 185,
-                MoyenneAvis = 3,
-                NombreAvisDepose = 46,
-                IsVerified = false,
-                DateDerniereUtilisation = new DateTime(2022, 7, 26, 13, 10, 33, 434),
-                DateAnonymisation = null
+                MdpClient = "IXT75PFE6LC!"
             };
 
             // Act
@@ -221,46 +216,57 @@ namespace MilibooAPI.Controllers.Tests
             // Assert
             Client? clientRecupere = context.Clients.Where(u => u.EmailClient.ToUpper() == clientATester.EmailClient.ToUpper()).FirstOrDefault();
 
-            clientATester.ClientId = clientRecupere.ClientId;
+            int clientId = context.Clients.OrderByDescending(c => c.ClientId)
+                      .Select(c => c.ClientId)
+                      .FirstOrDefault();
+
+            clientId = clientRecupere.ClientId;
             Assert.IsInstanceOfType(result, typeof(ActionResult<Client>), "Pas un ActionResult<Utilisateur>");
             Assert.IsInstanceOfType(result.Result, typeof(CreatedAtActionResult), "Pas un CreatedAtActionResult");
 
             var createdAtRouteResult = result.Result as CreatedAtActionResult;
 
+            CreateClientDTO dernierClientEnDTO = new CreateClientDTO()
+            {
+                NomPersonne = clientRecupere.NomPersonne,
+                PrenomPersonne = clientRecupere.PrenomPersonne,
+                TelPersonne = clientRecupere.TelPersonne,
+                EmailClient = clientRecupere.EmailClient,
+                MdpClient = clientRecupere.MdpClient
+            };
+
             //Assert.IsInstanceOfType(result.Value, typeof(Client), "Pas un Client");
-            Assert.AreEqual(clientATester, clientRecupere, "Clients pas identiques");
+            Assert.AreEqual(clientATester, dernierClientEnDTO, $"Clients pas identiques, nom : {clientRecupere.NomPersonne} - {clientATester.NomPersonne}" +
+                $", prenom : {clientRecupere.PrenomPersonne} - {clientATester.PrenomPersonne}" +
+                $", tel : {clientRecupere.TelPersonne} - {clientATester.TelPersonne}" +
+                $", Email : {clientRecupere.EmailClient} - {clientATester.EmailClient}" +
+                $", MdpClient : {clientRecupere.MdpClient} - {clientATester.MdpClient}");
         }
 
         [TestMethod]
         public void DeleteUtilisateurTest_OK()
         {
             // Arrange
-            Client utilisateur = new Client()
+            CreateClientDTO nouveauClient = new CreateClientDTO()
             {
-                ClientId = 78,
-                NomPersonne = "Berthet",
-                PrenomPersonne = "Mano",
+                NomPersonne = "Nouveau",
+                PrenomPersonne = "Client",
                 TelPersonne = "0626910251",
                 EmailClient = "mano.berthet@etu.univ-smb.fr",
-                MdpClient = "IXT75PFE6LC!",
-                NbTotalPointsFidelite = 185,
-                MoyenneAvis = 3,
-                NombreAvisDepose = 46,
-                IsVerified = false,
-                DateDerniereUtilisation = new DateTime(2022, 7, 26, 13, 10, 33, 434),
-                DateAnonymisation = null
+                MdpClient = "IXT75PFE6LC!"
             };
-            context.Clients.Add(utilisateur);
-            context.SaveChanges();
+            var post = controller.PostClient(nouveauClient).Result;
 
-            var utilisateurId = utilisateur.ClientId;
+            int clientId = context.Clients.OrderByDescending(c => c.ClientId)
+                     .Select(c => c.ClientId)
+                     .FirstOrDefault();
 
             // Act
-            var result = controller.DeleteClient(utilisateurId).Result;
+            var result = controller.DeleteClient(clientId).Result;
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult));
-            var utilisateurSupprime = context.Clients.Find(utilisateurId);
+            var utilisateurSupprime = context.Clients.Find(clientId);
             Assert.IsNull(utilisateurSupprime);
         }
 
