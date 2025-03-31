@@ -1,61 +1,75 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MilibooAPI.Models.EntityFramework;
 using MilibooAPI.Models.Repository;
 
 namespace MilibooAPI.Models.DataManager
 {
-    public class AvisClientManager : IDataRepository<AvisClient>
+    public class AvisClientManager : IDataRepositoryAvisClient
     {
-        readonly MilibooDBContext? milibooContext;
-        public AvisClientManager() { }
+        readonly MilibooDBContext _milibooContext;
+
         public AvisClientManager(MilibooDBContext context)
         {
-            milibooContext = context;
+            _milibooContext = context;
         }
+
         public async Task<ActionResult<IEnumerable<AvisClient>>> GetAllAsync()
         {
-            return await milibooContext.AvisClients.ToListAsync();
+            var avisClients = await _milibooContext.AvisClients.ToListAsync();
+            return avisClients;
         }
+
         public async Task<ActionResult<AvisClient>> GetByIdAsync(int id)
         {
-            var avisClients = await milibooContext.AvisClients
-       .Where(u => u.ProduitId == id)
-       .ToListAsync();
+            var avisClient = await _milibooContext.AvisClients
+                .FirstOrDefaultAsync(u => u.AvisId == id);
 
-            return new ObjectResult(avisClients)
+            if (avisClient == null)
             {
-                StatusCode = 200
-            };
-            //return await milibooContext.AvisClients.FirstOrDefaultAsync(u => u.ProduitId == id);
+                return new NotFoundObjectResult($"Avis client avec l'ID {id} non trouvé.");
+            }
+
+            return avisClient;
         }
-        public async Task<ActionResult<AvisClient>> GetByStringAsync(string nom)
+
+        public async Task<ActionResult<IEnumerable<AvisClient>>> GetAllByProduitIdAsync(int produitId)
         {
-            return null;
+            return await _milibooContext.AvisClients.Where(u => u.ProduitId == produitId).ToListAsync();
         }
+
+
+
+
+        public async Task<ActionResult<AvisClient>> GetByStringAsync(string str)
+        {
+            // Cette méthode n'est pas applicable pour AvisClient, mais est requise par l'interface
+            return new NotFoundResult();
+        }
+
         public async Task AddAsync(AvisClient entity)
         {
-            await milibooContext.AvisClients.AddAsync(entity);
-            await milibooContext.SaveChangesAsync();
+            await _milibooContext.AvisClients.AddAsync(entity);
+            await _milibooContext.SaveChangesAsync();
         }
-        public async Task UpdateAsync(AvisClient avisclient, AvisClient entity)
+
+        public async Task UpdateAsync(AvisClient entityToUpdate, AvisClient entity)
         {
-            milibooContext.Entry(avisclient).State = EntityState.Modified;
-            avisclient.AvisId = entity.AvisId;
-            avisclient.ClientId = entity.ClientId;
-            avisclient.ProduitId = entity.ProduitId;
-            avisclient.DescriptionAvis = entity.DescriptionAvis;
-            avisclient.NoteAvis = entity.NoteAvis;
-            avisclient.DateAvis = entity.DateAvis;
-            avisclient.TitreAvis = entity.TitreAvis;
-            avisclient.IdAvisParent = entity.IdAvisParent;
-            await milibooContext.SaveChangesAsync();
+            _milibooContext.Entry(entityToUpdate).State = EntityState.Modified;
+            entityToUpdate.ClientId = entity.ClientId;
+            entityToUpdate.ProduitId = entity.ProduitId;
+            entityToUpdate.DescriptionAvis = entity.DescriptionAvis;
+            entityToUpdate.NoteAvis = entity.NoteAvis;
+            entityToUpdate.DateAvis = entity.DateAvis;
+            entityToUpdate.TitreAvis = entity.TitreAvis;
+            entityToUpdate.IdAvisParent = entity.IdAvisParent;
+            await _milibooContext.SaveChangesAsync();
         }
-        public async Task DeleteAsync(AvisClient avisclient)
+
+        public async Task DeleteAsync(AvisClient entity)
         {
-            milibooContext.AvisClients.Remove(avisclient);
-            await milibooContext.SaveChangesAsync();
+            _milibooContext.AvisClients.Remove(entity);
+            await _milibooContext.SaveChangesAsync();
         }
     }
 }
