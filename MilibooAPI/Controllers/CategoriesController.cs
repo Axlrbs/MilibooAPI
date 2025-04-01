@@ -41,7 +41,14 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Categorie>>> GetAllCategories()
         {
-            return await dataRepositoryCategorie.GetAllAsync();
+            try
+            {
+                return await dataRepositoryCategorie.GetAllAsync();
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
 
         }
 
@@ -60,14 +67,23 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Categorie>> GetCategorieById(int id)
         {
-            var categorie = await dataRepositoryCategorie.GetByIdAsync(id);
-
-            if (categorie == null)
+            try
             {
-                return NotFound();
-            }
+                var categorie = await dataRepositoryCategorie.GetByIdAsync(id);
 
-            return categorie;
+                Console.WriteLine($"Valeur de categorie dans GetCategorieById : {categorie}");
+                if (categorie == null)
+                {
+                    Console.WriteLine("NotFound() est retourné !");
+                    return NotFound();
+                }
+
+                return categorie;
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
@@ -83,16 +99,23 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Categorie>> GetProduitsByIdCategorie(int id)
+        public async Task<ActionResult<Categorie>> GetFirstPhotoByCodeAsync(int id)
         {
-            var produits = await dataRepositoryCategorie.GetProduitsByIdCategorieAsync(id);
-
-            if (produits == null)
+            try
             {
-                return NotFound();
-            }
+                var produits = await dataRepositoryCategorie.GetProduitsByIdCategorieAsync(id);
 
-            return produits;
+                if (produits == null)
+                {
+                    return NotFound();
+                }
+
+                return produits;
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
@@ -110,14 +133,20 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Photo>> GetFirstPhotoByCode(string codePhoto)
         {
-            var photo = await dataRepositoryCategorie.GetFirstPhotoByCodeAsync(codePhoto);
-
-            if (photo == null)
+            try
             {
-                return NotFound();
-            }
+                var photo = await dataRepositoryCategorie.GetFirstPhotoByCodeAsync(codePhoto);
 
-            return photo;
+                if (photo == null)
+                {
+                    return NotFound();
+                }
+                return photo;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
@@ -135,14 +164,21 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Categorie>> GetCategorieByNom(string nom)
         {
-            var categorie = await dataRepositoryCategorie.GetByStringAsync(nom);
-
-            if (categorie == null)
+            try
             {
-                return NotFound();
-            }
+                var categorie = await dataRepositoryCategorie.GetByStringAsync(nom);
 
-            return categorie;
+                if (categorie == null)
+                {
+                    return NotFound();
+                }
+
+                return categorie;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
