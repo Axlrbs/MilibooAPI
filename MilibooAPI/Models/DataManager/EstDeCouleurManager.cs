@@ -19,7 +19,7 @@ namespace MilibooAPI.Models.DataManager
         }
         public async Task<ActionResult<EstDeCouleur>> GetByIdAsync(int id)
         {
-            return await milibooContext.EstDeCouleurs.FirstOrDefaultAsync(u => u.EstDeCouleurId == id);
+            return await milibooContext.EstDeCouleurs.FirstOrDefaultAsync(u => u.ProduitId == id);
         }
         public async Task<ActionResult<EstDeCouleur>> GetByStringAsync(string nom)
         {
