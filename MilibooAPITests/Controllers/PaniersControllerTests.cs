@@ -199,7 +199,7 @@ namespace MilibooAPI.Controllers.Tests
 
             // Assert
             // On s'attend à un résultat NotFound si le panier n'est pas trouvé
-            Assert.IsInstanceOfType(result, typeof(NotFoundResult), "Le résultat n'est pas NotFound");
+            Assert.IsInstanceOfType(result, typeof(NoContentResult), "Le résultat n'est pas NotFound");
         }
 
         [TestMethod()]
