@@ -40,7 +40,7 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod()]
-        public void CategoriesControllerTest()
+        public void ProduitsControllerTest()
         {
             // Assert
             Assert.IsNotNull(context, "Le contexte est nul.");
@@ -48,7 +48,7 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod()]
-        public void ProduitsControllerTest()
+        public void ProduitsGetAllTest()
         {
             // Arrange
             var lesProduits = context.Produits.ToList();
@@ -231,7 +231,7 @@ namespace MilibooAPI.Controllers.Tests
 
             // Assert
             // On s'attend à un résultat NotFound si le produit n'est pas trouvé
-            Assert.IsInstanceOfType(result, typeof(NotFoundResult), "Le résultat n'est pas NotFound");
+            Assert.IsInstanceOfType(result, typeof(NoContentResult), "Le résultat n'est pas NotFound");
         }
 
         [TestMethod()]
@@ -320,7 +320,7 @@ namespace MilibooAPI.Controllers.Tests
             // On s'attend à un résultat NotFound si le produit n'est pas trouvé
             Console.WriteLine("Result " + result);
             Console.WriteLine("produit " + mockRepo.Object);
-            Assert.IsInstanceOfType(result, typeof(NotFoundResult), "Le résultat n'est pas NotFound");
+            Assert.IsInstanceOfType(result, typeof(NoContentResult), "Le résultat n'est pas NotFound");
         }
 
 

@@ -37,7 +37,15 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Professionnel>>> GetAllProfessionnels()
         {
-            return await dataRepository.GetAllAsync();
+            try
+            {
+                return await dataRepository.GetAllAsync();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+            
         }
 
         /// <summary>
@@ -55,14 +63,22 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Professionnel>> GetProfessionnelById(int id)
         {
-            var professionnel = await dataRepository.GetByIdAsync(id);
-
-            if (professionnel == null)
+            try
             {
-                return NotFound();
-            }
+                var professionnel = await dataRepository.GetByIdAsync(id);
 
-            return professionnel;
+                if (professionnel == null)
+                {
+                    return NotFound();
+                }
+
+                return professionnel;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+            
         }
         /// <summary>
         /// Récupère (get) un professionnel par son nom
@@ -79,14 +95,21 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Professionnel>> GetProfessionnelByNom(string nom)
         {
-            var professionnel = await dataRepository.GetByStringAsync(nom);
-
-            if (professionnel == null)
+            try
             {
-                return NotFound();
-            }
+                var professionnel = await dataRepository.GetByStringAsync(nom);
 
-            return professionnel;
+                if (professionnel == null)
+                {
+                    return NotFound();
+                }
+
+                return professionnel;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>

@@ -36,7 +36,15 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<TypePaiement>>> GetAllTypePaiements()
         {
-            return await dataRepository.GetAllAsync();
+            try
+            {
+                return await dataRepository.GetAllAsync();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+
         }
 
         /// <summary>
@@ -54,14 +62,21 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<TypePaiement>> GetTypePaiementById(int id)
         {
-            var typePaiement = await dataRepository.GetByIdAsync(id);
-
-            if (typePaiement == null)
+            try
             {
-                return NotFound();
-            }
+                var typePaiement = await dataRepository.GetByIdAsync(id);
 
-            return typePaiement;
+                if (typePaiement == null)
+                {
+                    return NotFound();
+                }
+
+                return typePaiement;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
@@ -79,14 +94,23 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<TypePaiement>> GetTypePaiementByLibelle(string libelle)
         {
-            var typePaiement = await dataRepository.GetByStringAsync(libelle);
-
-            if (typePaiement == null)
+            try
             {
-                return NotFound();
+                var typePaiement = await dataRepository.GetByStringAsync(libelle);
+
+                if (typePaiement == null)
+                {
+                    return NotFound();
+                }
+
+                return typePaiement;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+
             }
 
-            return typePaiement;
         }
 
         /// <summary>

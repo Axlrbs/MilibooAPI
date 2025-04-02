@@ -41,7 +41,14 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<TypeProduit>>> GetAllTypeProduits()
         {
-            return await dataRepository.GetAllAsync();
+            try
+            {
+                return await dataRepository.GetAllAsync();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
@@ -59,14 +66,22 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<TypeProduit>> GetTypeProduitById(int id)
         {
-            var unTypeProduit = await dataRepository.GetByIdAsync(id);
-
-            if (unTypeProduit == null)
+            try
             {
-                return NotFound();
-            }
+                var unTypeProduit = await dataRepository.GetByIdAsync(id);
 
-            return unTypeProduit;
+                if (unTypeProduit == null)
+                {
+                    return NotFound();
+                }
+
+                return unTypeProduit;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+            
         }
 
         /// <summary>
@@ -84,14 +99,21 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<TypeProduit>> GetTypeProduitByLibelle(string libelle)
         {
-            var unTypeProduit = await dataRepository.GetByStringAsync(libelle);
-
-            if (unTypeProduit == null)
+            try
             {
-                return NotFound();
-            }
+                var unTypeProduit = await dataRepository.GetByStringAsync(libelle);
 
-            return unTypeProduit;
+                if (unTypeProduit == null)
+                {
+                    return NotFound();
+                }
+
+                return unTypeProduit;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
@@ -173,14 +195,20 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteTypeProduit(int id)
         {
-            var typeProduitToDelete = await dataRepository.GetByIdAsync(id);
-
-            if (typeProduitToDelete == null)
+            var typeProduit = await dataRepository.GetByIdAsync(id);
+            if (typeProduit == null)
             {
                 return NotFound();
             }
 
-            await dataRepository.DeleteAsync(typeProduitToDelete.Value);
+            try
+            {
+                await dataRepository.DeleteAsync(typeProduit.Value);
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Impossible de supprimer l'entité car elle est référencée ailleurs.");
+            }
 
             return NoContent();
         }
