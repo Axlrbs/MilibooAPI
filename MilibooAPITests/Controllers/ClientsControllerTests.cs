@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using MilibooAPI.Models.DataManager;
 using MilibooAPI.Models;
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 
 namespace MilibooAPI.Controllers.Tests
 {
@@ -69,6 +70,21 @@ namespace MilibooAPI.Controllers.Tests
             Assert.IsNotNull(result, "Le résultat est nul.");
             Assert.IsInstanceOfType(result, typeof(ActionResult<IEnumerable<Client>>), "Pas un ActionResult.");
             CollectionAssert.AreEqual(lesClients, listeClients, "Clients pas identiques.");
+        }
+
+        [TestMethod]
+        public async Task GetAllClients_ShouldReturn500_WhenExceptionIsThrown()
+        {
+            // Arrange
+            mockRepository.Setup(repo => repo.GetAllAsync()).ThrowsAsync(new Exception("Database error"));
+
+            // Act
+            var result = await controllerMoq.GetAllClients();
+
+            // Assert
+            var statusCodeResult = result.Result as ObjectResult;
+            Assert.IsNotNull(statusCodeResult);
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
         }
 
         [TestMethod()]
@@ -133,6 +149,22 @@ namespace MilibooAPI.Controllers.Tests
             Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
         }
 
+        [TestMethod]
+        public async Task GetClientById_ShouldReturn500_WhenExceptionIsThrown()
+        {
+            // Arrange
+            int id = 1;
+            mockRepository.Setup(repo => repo.GetByIdAsync(id)).ThrowsAsync(new Exception("Database error"));
+
+            // Act
+            var result = await controllerMoq.GetClientById(id);
+
+            // Assert
+            var statusCodeResult = result.Result as ObjectResult;
+            Assert.IsNotNull(statusCodeResult);
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+        }
+
         [TestMethod()]
         public void GetClientByNom_ExistingIdPassed_ReturnsRightItem()
         {
@@ -195,6 +227,141 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod]
+        public async Task GetClientByNom_ShouldReturn500_WhenExceptionIsThrown()
+        {
+            // Arrange
+            string nom = "CHAZOT";
+            mockRepository.Setup(repo => repo.GetByStringAsync(nom)).ThrowsAsync(new Exception("Database error"));
+
+            // Act
+            var result = await controllerMoq.GetClientByNom(nom);
+
+            // Assert
+            var statusCodeResult = result.Result as ObjectResult;
+            Assert.IsNotNull(statusCodeResult);
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+        }
+
+        [TestMethod()]
+        public void GetClientByEmail_ExistingEmailPassed_ReturnsRightItem()
+        {
+            // Arrange
+            var client1 = context.Clients.Where(u => u.EmailClient == "graziaem@gmail.com").FirstOrDefault();
+
+            // Act
+            var result = controller.GetClientByEmail("graziaem@gmail.com").Result;
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(ActionResult<Client>), "Pas un ActionResult.");
+            Assert.IsNull(result.Result, "Il y a une erreur.");
+            Assert.IsInstanceOfType(result.Value, typeof(Client), "Pas un client");
+            Assert.AreEqual(client1, result.Value, "Clients pas identiques.");
+        }
+
+        [TestMethod]
+        public void GetClientByEmail_UnknownEmailPassed_ReturnsNotFoundResult_Moq()
+        {
+            var mockRepository = new Mock<IDataRepositoryClient>();
+            var clientController = new ClientsController(mockRepository.Object);
+
+            // Act
+            var actionResult = clientController.GetClientByEmail("graziaem@gmail.comdazdadz").Result;
+
+            // Assert
+            Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
+        }
+
+        [TestMethod]
+        public async Task GetClientByMail_ShouldReturn500_WhenExceptionIsThrown()
+        {
+            // Arrange
+            string email = "graziaem@gmail.com";
+            mockRepository.Setup(repo => repo.GetByStringBisAsync(email)).ThrowsAsync(new Exception("Database error"));
+
+            // Act
+            var result = await controllerMoq.GetClientByEmail(email);
+
+            // Assert
+            var statusCodeResult = result.Result as ObjectResult;
+            Assert.IsNotNull(statusCodeResult);
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+        }
+
+        [TestMethod()]
+        public void PutUtilisateur_ValidUpdate_ReturnsNoContent()
+        {
+            // Arrange
+            Random rnd = new Random();
+            int chiffre = rnd.Next(1, 1000000000);
+
+            Client clientATester = new Client()
+            {
+                ClientId = 13,
+                NomPersonne = "Walter",
+                PrenomPersonne = "Gilbert",
+                TelPersonne = "0721481415",
+                EmailClient = "gilbert_walter" + chiffre + "@hotmail.org",
+                MdpClient = "WHG36MIH8FO",
+                NbTotalPointsFidelite = 61,
+                MoyenneAvis = (decimal)2.2,
+                NombreAvisDepose = 41
+            };
+
+            // Act
+            var result = controller.PutClient(13, clientATester).Result;
+
+            // Assert
+            var utilisateur1 = context.Clients.Where(u => u.ClientId == 13).FirstOrDefault();
+            Assert.IsInstanceOfType(result, typeof(NoContentResult), "N'est pas un NoContent");
+            Assert.AreEqual(((NoContentResult)result).StatusCode, StatusCodes.Status204NoContent, "N'est pas 204");
+            Assert.AreNotEqual(utilisateur1, clientATester, "L'Utilisateur n'a pas été modifié !");
+        }
+
+        [TestMethod()]
+        public void PutClient_ValidUpdate_ReturnsNoContent_Moq()
+        {
+            // Arrange
+            Random rnd = new Random();
+            int chiffre = rnd.Next(1, 1000000000);
+
+            Client clientAvant = new Client()
+            {
+                ClientId = 13,
+                NomPersonne = "Walter",
+                PrenomPersonne = "Gilbert",
+                TelPersonne = "0721481415",
+                EmailClient = "gilbert_walter@hotmail.org",
+                MdpClient = "WHG36MIH8FO",
+                NbTotalPointsFidelite = 61,
+                MoyenneAvis = (decimal)2.2,
+                NombreAvisDepose = 41
+            };
+
+            Client clientApres = new Client()
+            {
+                ClientId = 13,
+                NomPersonne = "Walter",
+                PrenomPersonne = "Gilbert",
+                TelPersonne = "0721481415",
+                EmailClient = "g.walter@hotmail.org", //email mofifié
+                MdpClient = "WHG36MIH8FO",
+                NbTotalPointsFidelite = 61,
+                MoyenneAvis = (decimal)2.2,
+                NombreAvisDepose = 41
+            };
+            mockRepository.Setup(x => x.GetByIdAsync(13).Result).Returns(clientAvant);
+
+            // Act
+            var result = controllerMoq.PutClient(13, clientApres).Result;
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(NoContentResult), "N'est pas un NoContent");
+            Assert.AreEqual(((NoContentResult)result).StatusCode, StatusCodes.Status204NoContent, "N'est pas 204");
+
+            mockRepository.Verify(x => x.UpdateAsync(It.IsAny<Client>(), clientApres), Times.Once, "La mise à jour n'a pas été effectuée !");
+        }
+
+        [TestMethod]
         public void Postutilisateur_ModelValidated_CreationOK()
         {
             // Arrange
@@ -236,7 +403,7 @@ namespace MilibooAPI.Controllers.Tests
             };
 
             //Assert.IsInstanceOfType(result.Value, typeof(Client), "Pas un Client");
-            Assert.AreEqual(clientATester, dernierClientEnDTO, $"Clients pas identiques, nom : {clientRecupere.NomPersonne} - {clientATester.NomPersonne}" +
+            Assert.AreEqual(clientATester, dernierClientEnDTO, $"Clients pas identiques, email : {clientRecupere.NomPersonne} - {clientATester.NomPersonne}" +
                 $", prenom : {clientRecupere.PrenomPersonne} - {clientATester.PrenomPersonne}" +
                 $", tel : {clientRecupere.TelPersonne} - {clientATester.TelPersonne}" +
                 $", Email : {clientRecupere.EmailClient} - {clientATester.EmailClient}" +

@@ -46,7 +46,15 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Client>>> GetAllClients()
         {
-            return await dataRepositoryClient.GetAllAsync();
+            try
+            {
+                return await dataRepositoryClient.GetAllAsync();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+            
         }
 
         /// <summary>
@@ -64,14 +72,21 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Client>> GetClientById(int id)
         {
-            var client = await dataRepositoryClient.GetByIdAsync(id);
-
-            if (client == null)
+            try
             {
-                return NotFound();
-            }
+                var client = await dataRepositoryClient.GetByIdAsync(id);
 
-            return client;
+                if (client == null)
+                {
+                    return NotFound();
+                }
+
+                return client;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
@@ -89,14 +104,22 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Client>> GetClientByNom(string nom)
         {
-            var client = await dataRepositoryClient.GetByStringAsync(nom);
-
-            if (client == null)
+            try
             {
-                return NotFound();
-            }
+                var client = await dataRepositoryClient.GetByStringAsync(nom);
 
-            return client;
+                if (client == null)
+                {
+                    return NotFound();
+                }
+
+                return client;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+            
         }
 
         /// <summary>
@@ -114,14 +137,22 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Client>> GetClientByEmail(string email)
         {
-            var client = await dataRepositoryClient.GetByStringBisAsync(email);
-
-            if (client == null)
+            try
             {
-                return NotFound();
-            }
+                var client = await dataRepositoryClient.GetByStringBisAsync(email);
 
-            return client;
+                if (client == null)
+                {
+                    return NotFound();
+                }
+
+                return client;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+            
         }
 
         /// <summary>

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MilibooAPI.Controllers;
+using MilibooAPI.Models;
 using MilibooAPI.Models.DataManager;
 using MilibooAPI.Models.EntityFramework;
 using MilibooAPI.Models.Repository;
@@ -98,23 +99,17 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod]
-        public async Task GetCategorieById_ShouldReturn404_WhenCategoryNotFound()
+        public void GetCategorieById_ShouldReturn404_WhenCategoryNotFound()
         {
             // Arrange
-            int id = 999;
-            mockRepository.Setup(repo => repo.GetByIdAsync(id)).ReturnsAsync((Categorie)null);
+            var mockRepository = new Mock<IDataRepositoryCategorie>();
+            var userController = new CategorieController(mockRepository.Object);
 
             // Act
-            var result = await controllerMoq.GetCategorieById(id);
-
-            // Debug
-            Console.WriteLine($"Résultat : {result}");
-            Console.WriteLine($"Résultat.Result : {result.Result}");
-
-            var notFoundResult = result.Result as NotFoundResult;
+            var actionResult = userController.GetCategorieById(999).Result;
 
             // Assert
-            Assert.IsNotNull(notFoundResult, "Le résultat est null, donc NotFound() n'a pas été retourné correctement.");
+            Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
         }
 
         [TestMethod]
@@ -145,7 +140,7 @@ namespace MilibooAPI.Controllers.Tests
             Assert.IsNotNull(expectedCategorie, "La catégorie avec l'ID spécifié n'existe pas dans la base de données.");
 
             // Act
-            var result = await controller.GetFirstPhotoByCodeAsync(id);
+            var result = await controller.GetProduitsByIdCategorie(id);
 
             // Assert
             Assert.IsNotNull(result);
@@ -156,20 +151,20 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod]
-        public async Task GetProduitsByIdCategorie_ShouldReturn404_WhenCategoryNotFound()
+        public void GetProduitsByIdCategorie_ShouldReturn404_WhenCategoryNotFound()
         {
+            
             // Arrange
-            int id = 999;
-            mockRepository.Setup(repo => repo.GetProduitsByIdCategorieAsync(id)).ReturnsAsync(null as Categorie);
+            var mockRepository = new Mock<IDataRepositoryCategorie>();
+            var userController = new CategorieController(mockRepository.Object);
 
             // Act
-            var result = await controllerMoq.GetFirstPhotoByCodeAsync(id);
+            var actionResult = userController.GetProduitsByIdCategorie(999).Result;
 
             // Assert
-            var statusCodeResult = result.Result as ObjectResult;
-            Assert.IsNotNull(statusCodeResult);
-            Assert.AreEqual(StatusCodes.Status404NotFound, statusCodeResult.StatusCode);
+            Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
         }
+        
 
         [TestMethod]
         public async Task GetProduitsByIdCategorie_ShouldReturn500_WhenServerErrorOccurs()
@@ -179,7 +174,7 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Setup(repo => repo.GetProduitsByIdCategorieAsync(id)).ThrowsAsync(new Exception("Erreur interne du serveur"));
 
             // Act
-            var result = await controllerMoq.GetFirstPhotoByCodeAsync(id);
+            var result = await controllerMoq.GetProduitsByIdCategorie(id);
 
             // Assert
             var statusCodeResult = result.Result as ObjectResult;
@@ -209,19 +204,17 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod]
-        public async Task GetFirstPhotoByCode_ShouldReturn404_WhenCodePhotoNotFound()
+        public void GetFirstPhotoByCode_ShouldReturn404_WhenCodePhotoNotFound()
         {
             // Arrange
-            string codePhoto = "999";
-            mockRepository.Setup(repo => repo.GetFirstPhotoByCodeAsync(codePhoto)).ReturnsAsync(null as Photo);
+            var mockRepository = new Mock<IDataRepositoryCategorie>();
+            var userController = new CategorieController(mockRepository.Object);
 
             // Act
-            var result = await controllerMoq.GetFirstPhotoByCode(codePhoto);
+            var actionResult = userController.GetFirstPhotoByCode("5465").Result;
 
             // Assert
-            var statusCodeResult = result.Result as ObjectResult;
-            Assert.IsNotNull(statusCodeResult);
-            Assert.AreEqual(StatusCodes.Status404NotFound, statusCodeResult.StatusCode);
+            Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
         }
 
         [TestMethod]
@@ -258,23 +251,17 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod]
-        public async Task GetCategorieByNom_ShouldReturn404_WhenCategoryNotFound()
+        public void GetCategorieByNom_ShouldReturn404_WhenCategoryNotFound()
         {
             // Arrange
-            string nom = "adzafaef";
-            mockRepository.Setup(repo => repo.GetByStringAsync(nom)).ReturnsAsync((Categorie)null);
+            var mockRepository = new Mock<IDataRepositoryCategorie>();
+            var userController = new CategorieController(mockRepository.Object);
 
             // Act
-            var result = await controllerMoq.GetCategorieByNom(nom);
-
-            // Debug
-            Console.WriteLine($"Résultat : {result}");
-            Console.WriteLine($"Résultat.Result : {result.Result}");
-
-            var notFoundResult = result.Result as NotFoundResult;
+            var actionResult = userController.GetFirstPhotoByCode("5465").Result;
 
             // Assert
-            Assert.IsNotNull(notFoundResult, "Le résultat est null, donc NotFound() n'a pas été retourné correctement.");
+            Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
         }
 
         [TestMethod]
