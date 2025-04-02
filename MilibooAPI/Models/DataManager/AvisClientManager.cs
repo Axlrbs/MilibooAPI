@@ -33,10 +33,38 @@ namespace MilibooAPI.Models.DataManager
             return avisClient;
         }
 
-        public async Task<ActionResult<IEnumerable<AvisClient>>> GetAllByProduitIdAsync(int produitId)
+        public async Task<ActionResult<IEnumerable<AvisClientDto>>> GetAllByProduitIdAsync(int produitId)
         {
-            return await _milibooContext.AvisClients.Where(u => u.ProduitId == produitId).ToListAsync();
+            var avisClients = await _milibooContext.AvisClients
+                .Where(u => u.ProduitId == produitId)
+                .Include(a => a.IdclientNavigation) // Récupérer le client
+                .Include(a => a.EstConstitues)
+                    .ThenInclude(ec => ec.CodephotoNavigation) // Récupérer les photos
+                .Select(a => new AvisClientDto
+                {
+                    ClientId = a.ClientId,
+                    ProduitId = a.ProduitId,
+                    DescriptionAvis = a.DescriptionAvis,
+                    NoteAvis = a.NoteAvis,
+                    TitreAvis = a.TitreAvis,
+                    DateAvis = a.DateAvis,
+
+                    // Infos du client
+                    NomClient = a.IdclientNavigation.NomPersonne,
+                    PrenomClient = a.IdclientNavigation.PrenomPersonne,
+                    EmailClient = a.IdclientNavigation.EmailClient,
+
+                    // Récupérer les URLs des photos associées à l'avis
+                    Photos = a.EstConstitues
+                        .Select(ec => ec.CodephotoNavigation.Urlphoto) // Suppose que CodephotoNavigation a un champ "Url"
+                        .ToList()
+                })
+                .ToListAsync();
+
+            return avisClients;
         }
+
+
 
 
 

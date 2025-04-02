@@ -53,7 +53,7 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<IEnumerable<AvisClient>>> GetAllAvisClientByProduitId(int id)
+        public async Task<ActionResult<IEnumerable<AvisClientDto>>> GetAllAvisClientByProduitId(int id)
         {
             var avisClient = await _dataRepository.GetAllByProduitIdAsync(id);
 

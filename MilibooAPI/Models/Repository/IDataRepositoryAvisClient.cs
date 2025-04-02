@@ -5,6 +5,6 @@ namespace MilibooAPI.Models.Repository
 {
     public interface IDataRepositoryAvisClient : IDataRepository<AvisClient>
     {
-        Task<ActionResult<IEnumerable<AvisClient>>> GetAllByProduitIdAsync(int produitId);
+        Task<ActionResult<IEnumerable<AvisClientDto>>> GetAllByProduitIdAsync(int produitId);
     }
 }

@@ -53,5 +53,13 @@ namespace MilibooAPI.Models.EntityFramework
         public string? DescriptionAvis { get; set; }
         public int? NoteAvis { get; set; }
         public string? TitreAvis { get; set; }
+        public DateTime? DateAvis{ get; set; }
+
+        // Ajout des infos du client
+        public string? NomClient { get; set; }
+        public string? PrenomClient { get; set; }
+        public string? EmailClient { get; set; }
+        public List<string> Photos { get; set; } = new List<string>();
     }
+
 }
