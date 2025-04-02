@@ -209,7 +209,10 @@ namespace MilibooAPI.Controllers.Tests
         public async Task PostTypePaiement_ShouldReturnCreatedAtAction_WhenSuccessful()
         {
             // Arrange
-            var typePaiement = new TypePaiement { TypePaiementId = 1, Libelletypepaiement = "Test" };
+            int produitId = context.TypePaiements.OrderByDescending(c => c.TypePaiementId)
+                      .Select(c => c.TypePaiementId)
+                      .FirstOrDefault();
+            var typePaiement = new TypePaiement { TypePaiementId = produitId + 1, Libelletypepaiement = "Test" };
             mockRepository.Setup(repo => repo.AddAsync(typePaiement)).Returns(Task.CompletedTask);
 
             // Act
