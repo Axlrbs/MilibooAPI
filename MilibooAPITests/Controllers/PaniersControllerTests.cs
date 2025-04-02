@@ -166,6 +166,43 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod()]
+        public async Task PutPanier_NonMatchingId_ReturnsBadRequest()
+        {
+            // Arrange
+            var mockRepo = new Mock<IDataRepository<Panier>>();
+            var controller = new PaniersController(mockRepo.Object);
+
+            var panier = new Panier { PanierId = 2, ClientId = 1,Dateetheure = DateOnly.FromDateTime(DateTime.Now) }; // ID différent
+
+            // Act
+            var result = await controller.PutPanier(1, panier);
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(BadRequestResult), "Le résultat n'est pas BadRequest");
+        }
+
+        [TestMethod()]
+        public async Task PutPanier_NonExistingPanier_ReturnsNotFound()
+        {
+            // Arrange
+            var mockRepo = new Mock<IDataRepository<Panier>>();
+            int panierId = 1;
+
+            // Simuler que le panier n'existe pas (retourner null pour simuler un panier introuvable)
+            mockRepo.Setup(m => m.GetByIdAsync(panierId))
+                    .ReturnsAsync((Panier)null); // Aucun panier trouvé, retourne null
+
+            var controller = new PaniersController(mockRepo.Object);
+
+            // Act
+            var result = await controller.PutPanier(panierId, new Panier { PanierId = panierId });
+
+            // Assert
+            // On s'attend à un résultat NotFound si le panier n'est pas trouvé
+            Assert.IsInstanceOfType(result, typeof(NotFoundResult), "Le résultat n'est pas NotFound");
+        }
+
+        [TestMethod()]
         public async Task PostPanier_ValidClient_ReturnsCreated()
         {
             // Arrange

@@ -40,7 +40,7 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod()]
-        public void CategoriesControllerTest()
+        public void ProduitsControllerTest()
         {
             // Assert
             Assert.IsNotNull(context, "Le contexte est nul.");
@@ -48,7 +48,7 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod()]
-        public void ProduitsControllerTest()
+        public void ProduitsGetAllTest()
         {
             // Arrange
             var lesProduits = context.Produits.ToList();
