@@ -42,7 +42,7 @@ namespace MilibooAPI.Controllers.Tests
             context = new MilibooDBContext();
             //controller = new UtilisateursController(context);
             dataRepository = new ClientManager(context);
-            controller = new (dataRepository);
+            controller = new ClientsController(dataRepository);
 
             mockRepository = new Mock<IDataRepositoryClient>();
             controllerMoq = new ClientsController(mockRepository.Object);

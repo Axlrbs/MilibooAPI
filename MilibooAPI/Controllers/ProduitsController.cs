@@ -41,7 +41,14 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Produit>>> GetAllProduits()
         {
-            return await dataRepository.GetAllAsync();
+            try
+            {
+                return await dataRepository.GetAllAsync();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
@@ -59,14 +66,22 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Produit>> GetProduitById(int id)
         {
-            var produit = await dataRepository.GetByIdAsync(id);
-
-            if (produit == null)
+            try
             {
-                return NotFound();
-            }
+                var produit = await dataRepository.GetByIdAsync(id);
 
-            return produit;
+                if (produit == null)
+                {
+                    return NotFound();
+                }
+
+                return produit;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+            
         }
 
         /// <summary>
@@ -84,14 +99,21 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Produit>> GetProduitByReference(string reference)
         {
-            var produit = await dataRepository.GetByStringAsync(reference);
-
-            if (produit == null)
+            try
             {
-                return NotFound();
-            }
+                var produit = await dataRepository.GetByStringAsync(reference);
 
-            return produit;
+                if (produit == null)
+                {
+                    return NotFound();
+                }
+
+                return produit;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>

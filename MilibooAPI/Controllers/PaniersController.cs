@@ -35,7 +35,14 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Panier>>> GetAllPaniers()
         {
-            return await dataRepository.GetAllAsync();
+            try
+            {
+                return await dataRepository.GetAllAsync();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
 
@@ -54,14 +61,22 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Panier>> GetPanierByIdClient(int clientId)
         {
-            var panier = await dataRepository.GetByIdAsync(clientId);  
-
-            if (panier == null)
+            try
             {
-                return NotFound();
-            }
+                var panier = await dataRepository.GetByIdAsync(clientId);
 
-            return panier;
+                if (panier == null)
+                {
+                    return NotFound();
+                }
+
+                return panier;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+            
         }
 
 
