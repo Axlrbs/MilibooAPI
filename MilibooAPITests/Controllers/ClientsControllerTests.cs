@@ -288,7 +288,7 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod()]
-        public void PutUtilisateur_ValidUpdate_ReturnsNoContent()
+        public void PutClient_ValidUpdate_ReturnsNoContent()
         {
             // Arrange
             Random rnd = new Random();
@@ -362,7 +362,7 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod]
-        public void Postutilisateur_ModelValidated_CreationOK()
+        public void PostClient_ModelValidated_CreationOK()
         {
             // Arrange
             Random rnd = new Random();
@@ -411,7 +411,7 @@ namespace MilibooAPI.Controllers.Tests
         }
 
         [TestMethod]
-        public void DeleteUtilisateurTest_OK()
+        public void DeleteClientTest_OK()
         {
             // Arrange
             CreateClientDTO nouveauClient = new CreateClientDTO()

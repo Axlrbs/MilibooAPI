@@ -38,7 +38,14 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<Commande>>> GetAllCommandes()
         {
-            return await dataRepositoryCommande.GetAllAsync();
+            try
+            {
+                return await dataRepositoryCommande.GetAllAsync();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
@@ -56,14 +63,22 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Commande>> GetCommandeById(int id)
         {
-            var commande = await dataRepositoryCommande.GetByIdAsync(id);
-
-            if (commande == null)
+            try
             {
-                return NotFound();
-            }
+                var commande = await dataRepositoryCommande.GetByIdAsync(id);
 
-            return commande;
+                if (commande == null)
+                {
+                    return NotFound();
+                }
+
+                return commande;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+            
         }
 
         /// <summary>
@@ -81,14 +96,21 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Commande>> GetCommandeByIdClient(int idclient)
         {
-            var commande = await dataRepositoryCommande.GetByIdClientAsync(idclient);
-
-            if (commande == null)
+            try
             {
-                return NotFound();
-            }
+                var commande = await dataRepositoryCommande.GetByIdClientAsync(idclient);
 
-            return commande;
+                if (commande == null)
+                {
+                    return NotFound();
+                }
+
+                return commande;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
@@ -106,14 +128,22 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Commande>> GetCommandeByStatus(string status)
         {
-            var commande = await dataRepositoryCommande.GetByStringAsync(status);
-
-            if (commande == null)
+            try
             {
-                return NotFound();
-            }
+                var commande = await dataRepositoryCommande.GetByStringAsync(status);
 
-            return commande;
+                if (commande == null)
+                {
+                    return NotFound();
+                }
+
+                return commande;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+            
         }
 
 
