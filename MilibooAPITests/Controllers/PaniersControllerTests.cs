@@ -155,10 +155,10 @@ namespace MilibooAPI.Controllers.Tests
             mockRepo.Setup(m => m.UpdateAsync(It.IsAny<Panier>(), It.IsAny<Panier>()))
                     .Returns(Task.CompletedTask);
 
-            var controller = new PaniersController(mockRepo.Object);
+            var controllerMoq1 = new PaniersController(mockRepo.Object);
 
             // Act
-            var result = await controller.PutPanier(1, panierMisAJour);
+            var result = await controllerMoq1.PutPanier(1, panierMisAJour);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult), "N'est pas un NoContent");
@@ -170,12 +170,12 @@ namespace MilibooAPI.Controllers.Tests
         {
             // Arrange
             var mockRepo = new Mock<IDataRepository<Panier>>();
-            var controller = new PaniersController(mockRepo.Object);
+            var controllerMoq1 = new PaniersController(mockRepo.Object);
 
             var panier = new Panier { PanierId = 2, ClientId = 1,Dateetheure = DateOnly.FromDateTime(DateTime.Now) }; // ID différent
 
             // Act
-            var result = await controller.PutPanier(1, panier);
+            var result = await controllerMoq1.PutPanier(1, panier);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(BadRequestResult), "Le résultat n'est pas BadRequest");
@@ -192,10 +192,10 @@ namespace MilibooAPI.Controllers.Tests
             mockRepo.Setup(m => m.GetByIdAsync(panierId))
                     .ReturnsAsync((Panier)null); // Aucun panier trouvé, retourne null
 
-            var controller = new PaniersController(mockRepo.Object);
+            var controllerMoq1 = new PaniersController(mockRepo.Object);
 
             // Act
-            var result = await controller.PutPanier(panierId, new Panier { PanierId = panierId });
+            var result = await controllerMoq1.PutPanier(panierId, new Panier { PanierId = panierId });
 
             // Assert
             // On s'attend à un résultat NotFound si le panier n'est pas trouvé
@@ -213,10 +213,10 @@ namespace MilibooAPI.Controllers.Tests
                     .Returns(Task.CompletedTask)
                     .Callback<Panier>(p => p.PanierId = 1); // Simule l'affectation d'un ID après l'ajout
 
-            var controller = new PaniersController(mockRepo.Object);
+            var controllerMoq1 = new PaniersController(mockRepo.Object);
 
             // Act
-            var result = await controller.PostPanier(clientId);
+            var result = await controllerMoq1.PostPanier(clientId);
 
             // Assert
             var createdResult = result.Result as CreatedAtActionResult;
@@ -243,10 +243,10 @@ namespace MilibooAPI.Controllers.Tests
             mockRepo.Setup(m => m.DeleteAsync(It.IsAny<Panier>()))
                     .Returns(Task.CompletedTask);
 
-            var controller = new PaniersController(mockRepo.Object);
+            var controllerMoq1 = new PaniersController(mockRepo.Object);
 
             // Act
-            var result = await controller.DeletePanier(panierId);
+            var result = await controllerMoq1.DeletePanier(panierId);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult), "Le résultat n'est pas NoContent");

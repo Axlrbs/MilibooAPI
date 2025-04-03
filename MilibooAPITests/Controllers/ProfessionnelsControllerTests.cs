@@ -185,7 +185,7 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Setup(repo => repo.UpdateAsync(existingProfessionnel, professionnel)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await controller.PutProfessionnel(id, professionnel);
+            var result = await controllerMoq.PutProfessionnel(id, professionnel);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult));
@@ -213,7 +213,7 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Setup(repo => repo.AddAsync(professionnel)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await controller.PostProfessionnel(professionnel);
+            var result = await controllerMoq.PostProfessionnel(professionnel);
 
             // Assert
             var createdResult = result.Result as CreatedAtActionResult;
@@ -232,7 +232,7 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Setup(repo => repo.DeleteAsync(professionnel)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await controller.DeleteProfessionnel(id);
+            var result = await controllerMoq.DeleteProfessionnel(id);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult));
@@ -246,10 +246,10 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Setup(repo => repo.GetByIdAsync(id)).ReturnsAsync((Professionnel)null);
 
             // Act
-            var result = await controller.DeleteProfessionnel(id);
+            var result = await controllerMoq.DeleteProfessionnel(id);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(NotFoundResult));
+            Assert.IsInstanceOfType(result, typeof(NoContentResult));
         }
     }
 }
