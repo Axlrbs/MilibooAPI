@@ -35,7 +35,7 @@ namespace MilibooAPI.Controllers
         /// <returns>Réponse http</returns>
         /// <response code="200">Quand toutes les catégories ont été renvoyés avec succès</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // GET: api/Categories
+        // GET: api/Categories/GetAllCategories
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -45,7 +45,7 @@ namespace MilibooAPI.Controllers
             {
                 return await dataRepositoryCategorie.GetAllAsync();
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
             }
@@ -60,7 +60,7 @@ namespace MilibooAPI.Controllers
         /// <response code="200">Quand la catégorie a été trouvée</response>
         /// <response code="404">Quand la catégorie n'a pas été trouvée</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // GET: api/Categories/3
+        // GET: api/Categories/GetCategorieById/3
         [HttpGet("[action]/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -80,7 +80,7 @@ namespace MilibooAPI.Controllers
 
                 return categorie;
             }
-            catch(Exception ex)
+            catch(Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
             }
@@ -94,7 +94,7 @@ namespace MilibooAPI.Controllers
         /// <response code="200">Quand la catégorie a été trouvée</response>
         /// <response code="404">Quand la catégorie n'a pas été trouvée</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        // GET: api/Categories/5
+        // GET: api/Categories/GetProduitsByIdCategorie/5
         [HttpGet("[action]/{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -112,7 +112,39 @@ namespace MilibooAPI.Controllers
 
                 return produits;
             }
-            catch(Exception ex)
+            catch(Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+        }
+
+        /// <summary>
+        /// Récupère (get) les sous-catégories d'une catégorie par son ID
+        /// </summary>
+        /// <param name="id">L'id de la catégorie parent</param>
+        /// <returns>Réponse http</returns>
+        /// <response code="200">Quand la catégorie parent a été trouvée</response>
+        /// <response code="404">Quand la catégorie parent n'a pas été trouvée</response>
+        /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        // GET: api/Categories/GetCategoriesByIdCategorieParent/5
+        [HttpGet("[action]/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<IEnumerable<Categorie>>> GetCategoriesByIdCategorieParent(int id)
+        {
+            try
+            {
+                var categories = await dataRepositoryCategorie.GetCategoriesByIdCategorieParentAsync(id);
+
+                if (categories == null)
+                {
+                    return NotFound();
+                }
+
+                return categories;
+            }
+            catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
             }
