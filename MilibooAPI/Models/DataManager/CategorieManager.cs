@@ -28,6 +28,12 @@ namespace MilibooAPI.Models.DataManager
             return await milibooContext.Categories.Include(a => a.ACommes).ThenInclude(b => b.IdproduitNavigation).ThenInclude(c => c.EstDeCouleurs).FirstOrDefaultAsync(u => u.CategorieId == id);
         }
 
+        public async Task<ActionResult<IEnumerable<Categorie>>> GetCategoriesByIdCategorieParentAsync(int id)
+        {
+            return await milibooContext.Categories.Where(u => u.CatIdCategorie == id).ToListAsync();
+        }
+
+
         public async Task<ActionResult<Photo>> GetFirstPhotoByCodeAsync(string codePhoto)
         {
             return await milibooContext.Photos.FirstOrDefaultAsync(u => u.CodePhoto == codePhoto);
