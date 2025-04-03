@@ -167,7 +167,14 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<IEnumerable<EstDeCouleur>>> GetAllEstDeCouleurs()
         {
-            return await dataRepository.GetAllAsync();
+            try
+            {
+                return await dataRepository.GetAllAsync();
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
@@ -185,14 +192,21 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<EstDeCouleur>> GetEstDeCouleurById(int id)
         {
-            var estdecouleur = await dataRepository.GetByIdAsync(id);
-
-            if (estdecouleur == null)
+            try
             {
-                return NotFound();
-            }
+                var estdecouleur = await dataRepository.GetByIdAsync(id);
 
-            return estdecouleur;
+                if (estdecouleur == null)
+                {
+                    return NotFound();
+                }
+
+                return estdecouleur;
+            }
+            catch (Exception) 
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>

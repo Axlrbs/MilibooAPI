@@ -143,7 +143,7 @@ namespace MilibooAPI.Controllers.Tests
             var clientController = new ClientsController(mockRepository.Object);
 
             // Act
-            var actionResult = clientController.GetClientById(0).Result;
+            var actionResult = controllerMoq.GetClientById(0).Result;
 
             // Assert
             Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));
@@ -220,7 +220,7 @@ namespace MilibooAPI.Controllers.Tests
             var clientController = new ClientsController(mockRepository.Object);
 
             // Act
-            var actionResult = clientController.GetClientByNom("a").Result;
+            var actionResult = controllerMoq.GetClientByNom("a").Result;
 
             // Assert
             Assert.IsInstanceOfType(actionResult.Result, typeof(NotFoundResult));

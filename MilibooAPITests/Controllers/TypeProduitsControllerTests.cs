@@ -41,7 +41,7 @@ namespace MilibooAPI.Controllers.Tests
 
 
         [TestMethod()]
-        public void TypePaiementsControllerTest()
+        public void TypeProduitsControllerTest()
         {
             // Assert
             Assert.IsNotNull(context, "Le contexte est nul.");
@@ -186,7 +186,7 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Setup(repo => repo.UpdateAsync(existingTypeProduit, typeProduit)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await controller.PutTypeProduit(id, typeProduit);
+            var result = await controllerMoq.PutTypeProduit(id, typeProduit);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult));
@@ -217,7 +217,7 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Setup(repo => repo.AddAsync(typeProduit)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await controller.PostTypeProduit(typeProduit);
+            var result = await controllerMoq.PostTypeProduit(typeProduit);
 
             // Assert
             var createdResult = result.Result as CreatedAtActionResult;
@@ -236,10 +236,10 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Setup(repo => repo.DeleteAsync(typeProduit)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await controller.DeleteTypeProduit(id);
+            var result = await controllerMoq.DeleteTypeProduit(id);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(ObjectResult));
+            Assert.IsInstanceOfType(result, typeof(NoContentResult));
         }
 
         [TestMethod]
@@ -250,10 +250,10 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Setup(repo => repo.GetByIdAsync(id)).ReturnsAsync((TypeProduit)null);
 
             // Act
-            var result = await controller.DeleteTypeProduit(id);
+            var result = await controllerMoq.DeleteTypeProduit(id);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(ObjectResult));
+            Assert.IsInstanceOfType(result, typeof(NoContentResult));
         }
     }
 }

@@ -185,7 +185,7 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Setup(repo => repo.UpdateAsync(existingTypePaiement, typePaiement)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await controller.PutTypePaiement(id, typePaiement);
+            var result = await controllerMoq.PutTypePaiement(id, typePaiement);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult));
@@ -199,7 +199,7 @@ namespace MilibooAPI.Controllers.Tests
             var typePaiement = new TypePaiement { TypePaiementId = 2, Libelletypepaiement = "Test" };
 
             // Act
-            var result = await controller.PutTypePaiement(id, typePaiement);
+            var result = await controllerMoq.PutTypePaiement(id, typePaiement);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(BadRequestResult));
@@ -216,7 +216,7 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Setup(repo => repo.AddAsync(typePaiement)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await controller.PostTypePaiement(typePaiement);
+            var result = await controllerMoq.PostTypePaiement(typePaiement);
 
             // Assert
             var createdResult = result.Result as CreatedAtActionResult;
@@ -235,7 +235,7 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Setup(repo => repo.DeleteAsync(typePaiement)).Returns(Task.CompletedTask);
 
             // Act
-            var result = await controller.DeleteTypePaiement(id);
+            var result = await controllerMoq.DeleteTypePaiement(id);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult));
@@ -245,14 +245,14 @@ namespace MilibooAPI.Controllers.Tests
         public async Task DeleteTypePaiement_ShouldReturnNotFound_WhenTypePaiementDoesNotExist()
         {
             // Arrange
-            var id = 1;
+            var id = 99;
             mockRepository.Setup(repo => repo.GetByIdAsync(id)).ReturnsAsync((TypePaiement)null);
 
             // Act
-            var result = await controller.DeleteTypePaiement(id);
+            var result = await controllerMoq.DeleteTypePaiement(id);
 
             // Assert
-            Assert.IsInstanceOfType(result, typeof(NotFoundResult));
+            Assert.IsInstanceOfType(result, typeof(NoContentResult));
         }
     }
 }

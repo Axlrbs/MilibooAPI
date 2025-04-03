@@ -188,10 +188,10 @@ namespace MilibooAPI.Controllers.Tests
             mockRepo.Setup(m => m.UpdateAsync(It.IsAny<Produit>(), It.IsAny<Produit>()))
                     .Returns(Task.CompletedTask);
 
-            var controller = new ProduitsController(mockRepo.Object);
+            var controllerMoq1 = new ProduitsController(mockRepo.Object);
 
             // Act
-            var result = await controller.PutProduit(produitId, produitMisAJour);
+            var result = await controllerMoq1.PutProduit(produitId, produitMisAJour);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult), "Le résultat n'est pas NoContent");
@@ -202,12 +202,12 @@ namespace MilibooAPI.Controllers.Tests
         {
             // Arrange
             var mockRepo = new Mock<IDataRepository<Produit>>();
-            var controller = new ProduitsController(mockRepo.Object);
+            var controllerMoq1 = new ProduitsController(mockRepo.Object);
 
             var produit = new Produit { ProduitId = 2, Reference = "PROD001" }; // ID différent
 
             // Act
-            var result = await controller.PutProduit(1, produit);
+            var result = await controllerMoq1.PutProduit(1, produit);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(BadRequestResult), "Le résultat n'est pas BadRequest");
@@ -224,10 +224,10 @@ namespace MilibooAPI.Controllers.Tests
             mockRepo.Setup(m => m.GetByIdAsync(produitId))
                     .ReturnsAsync((Produit)null); // Aucun produit trouvé, retourne null
 
-            var controller = new ProduitsController(mockRepo.Object);
+            var controllerMoq1 = new ProduitsController(mockRepo.Object);
 
             // Act
-            var result = await controller.PutProduit(produitId, new Produit { ProduitId = produitId });
+            var result = await controllerMoq1.PutProduit(produitId, new Produit { ProduitId = produitId });
 
             // Assert
             // On s'attend à un résultat NotFound si le produit n'est pas trouvé
@@ -245,10 +245,10 @@ namespace MilibooAPI.Controllers.Tests
                     .Returns(Task.CompletedTask)
                     .Callback<Produit>(p => p.ProduitId = 1); // Simule l'affectation d'un ID
 
-            var controller = new ProduitsController(mockRepo.Object);
+            var controllerMoq1 = new ProduitsController(mockRepo.Object);
 
             // Act
-            var result = await controller.PostProduit(produit);
+            var result = await controllerMoq1.PostProduit(produit);
 
             // Assert
             var createdResult = result.Result as CreatedAtActionResult;
@@ -265,13 +265,13 @@ namespace MilibooAPI.Controllers.Tests
         {
             // Arrange
             var mockRepo = new Mock<IDataRepository<Produit>>();
-            var controller = new ProduitsController(mockRepo.Object);
-            controller.ModelState.AddModelError("Reference", "Required"); // Simule une erreur de validation
+            var controllerMoq1 = new ProduitsController(mockRepo.Object);
+            controllerMoq1.ModelState.AddModelError("Reference", "Required"); // Simule une erreur de validation
 
             var produit = new Produit { ProduitId = 1 }; // Produit invalide (pas de référence)
 
             // Act
-            var result = await controller.PostProduit(produit);
+            var result = await controllerMoq1.PostProduit(produit);
 
             // Assert
             Assert.IsInstanceOfType(result.Result, typeof(BadRequestObjectResult), "Le résultat n'est pas BadRequest");
@@ -292,10 +292,10 @@ namespace MilibooAPI.Controllers.Tests
             mockRepo.Setup(m => m.DeleteAsync(It.IsAny<Produit>()))
                     .Returns(Task.CompletedTask);
 
-            var controller = new ProduitsController(mockRepo.Object);
+            var controllerMoq1 = new ProduitsController(mockRepo.Object);
 
             // Act
-            var result = await controller.DeleteProduit(produitId);
+            var result = await controllerMoq1.DeleteProduit(produitId);
 
             // Assert
             Assert.IsInstanceOfType(result, typeof(NoContentResult), "Le résultat n'est pas NoContent");
@@ -311,10 +311,10 @@ namespace MilibooAPI.Controllers.Tests
             // Simuler que le produit n'existe pas (retourner null pour simuler un produit introuvable)
             mockRepo.Setup(m => m.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Produit)null);
 
-            var controller = new ProduitsController(mockRepo.Object);
+            var controllerMoq1 = new ProduitsController(mockRepo.Object);
 
             // Act
-            var result = await controller.DeleteProduit(produitId);
+            var result = await controllerMoq1.DeleteProduit(produitId);
 
             // Assert
             // On s'attend à un résultat NotFound si le produit n'est pas trouvé
