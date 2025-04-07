@@ -19,7 +19,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVueApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:8978", "http://localhost:8948", "http://localhost:8951", "http://51.83.36.122:8953")
+        policy.WithOrigins("http://localhost:5173", "http://localhost:8978", "http://localhost:8948", "http://localhost:8951", "http://51.83.36.122:8948", "http://51.83.36.122:8953")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials(); 
@@ -27,11 +27,11 @@ builder.Services.AddCors(options =>
 });
 
 builder.Services.AddControllers()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-            });
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
+    });
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -73,6 +73,10 @@ builder.Services.AddScoped<IDataRepositoryEstDeCouleur, EstDeCouleurManager>();
 builder.Services.AddScoped<IDataRepositoryAvisClient, AvisClientManager>();
 builder.Services.AddScoped<IDataRepository<TypePaiement>, TypePaiementManager>();
 builder.Services.AddScoped<IDataRepositoryEstDans, EstDansManager>();
+builder.Services.AddScoped<IDataRepository<CarteBancaire>, CarteBancaireManager>();
+builder.Services.AddScoped<IDataRepository<LivraisonDomicile>, LivraisonDomicileManager>();
+builder.Services.AddScoped<IDataRepository<Adresse>, AdresseManager>();
+
 
 // Configure DB context
 builder.Services.AddDbContext<MilibooDBContext>(options =>
