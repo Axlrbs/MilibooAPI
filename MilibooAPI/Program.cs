@@ -83,6 +83,7 @@ builder.Services.AddScoped<IDataRepositoryTypeProduit, TypeProduitManager>();
 
 
 
+
 // Configure DB context
 builder.Services.AddDbContext<MilibooDBContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("MilibooConnection")));
