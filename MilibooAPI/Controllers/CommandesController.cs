@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MilibooAPI.Models;
 using MilibooAPI.Models.EntityFramework;
 using MilibooAPI.Models.Repository;
 
@@ -200,15 +201,28 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Commande>> PostCommande(Commande commande)
+        public async Task<ActionResult<Commande>> PostCommande(CreateCommandeDTO commandeDTO)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
+            var commande = new Commande
+            {
+                PanierId = commandeDTO.PanierId,
+                ClientId = commandeDTO.ClientId,
+                LivraisonId = commandeDTO.LivraisonId,
+                CarteBancaireId = commandeDTO.CarteBancaireId,
+                MontantCommande = commandeDTO.MontantCommande,
+                DateFacture = commandeDTO.DateFacture,
+                NbPointFidelite = commandeDTO.NbPointFidelite,
+                Statut = commandeDTO.Statut,
+            };
+
             await dataRepositoryCommande.AddAsync(commande);
 
-            return CreatedAtAction("GetCommandeById", new { id = commande.CommandeId }, commande);
+            return CreatedAtAction(nameof(GetCommandeById), new { id = commande.CommandeId }, commande);
         }
 
         /// <summary>
