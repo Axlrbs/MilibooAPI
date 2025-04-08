@@ -9,7 +9,7 @@ namespace MilibooAPI.Models
         public int ClientId { get; set; }
         public int LivraisonId { get; set; }
         public int CarteBancaireId { get; set; }
-        public float MontantCommande {  get; set; }
+        public decimal MontantCommande {  get; set; }
         public DateTime DateFacture { get; set; } = DateTime.Now;
         public int NbPointFidelite { get; set; }
         public string Statut { get; set; } = "en attente de validation";
