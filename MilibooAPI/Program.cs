@@ -78,7 +78,7 @@ builder.Services.AddScoped<IDataRepository<LivraisonDomicile>, LivraisonDomicile
 builder.Services.AddScoped<IDataRepository<Adresse>, AdresseManager>();
 builder.Services.AddScoped<IDataRepository<Ville>, VilleManager>();
 builder.Services.AddScoped<IDataRepository<Pays>, PaysManager>();
-builder.Services.AddScoped<IDataRepositoryTypeProduit, TypeProduitManager>();
+builder.Services.AddScoped<IDataRepository<TypeProduit>, TypeProduitManager>();
 
 
 
