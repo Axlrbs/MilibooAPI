@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using MilibooAPI.Models.EntityFramework;
 using MilibooAPI.Models.Repository;
+using MilibooAPI.Models;
 
 namespace MilibooAPI.Controllers
 {
@@ -90,20 +91,23 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<Adresse>> PostAdresse(Adresse adresse)
+        public async Task<ActionResult<Adresse>> PostAdresse(CreateAdresseDTO adresseDTO)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
-            try
+            var adresse = new Adresse
             {
-                await dataRepository.AddAsync(adresse);
-                return CreatedAtAction(nameof(GetAdresseById), new { id = adresse.AdresseId }, adresse);
-            }
-            catch
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
-            }
+                NumeroInsee = adresseDTO.NumeroInsee,
+                PaysId = adresseDTO.PaysId,
+                Rue = adresseDTO.Rue,
+                CodePostal = adresseDTO.CodePostal,
+            };
+
+            await dataRepository.AddAsync(adresse);
+            return CreatedAtAction(nameof(GetAdresseById), new { id = adresse.AdresseId }, adresse);
         }
 
         /// <summary>
