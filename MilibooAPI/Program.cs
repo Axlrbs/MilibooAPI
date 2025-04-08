@@ -19,7 +19,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowVueApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:8950", "http://localhost:8978", "http://localhost:8948", "http://localhost:8951", "http://51.83.36.122:8948", "http://51.83.36.122:8953")
+        policy.WithOrigins("http://localhost:5173", "http://localhost:8950", "http://localhost:8978", "http://localhost:8948", "http://localhost:8951", "http://51.83.36.122:8948", "http://51.83.36.122:8953", "http://51.83.36.122:8954")
               .AllowAnyHeader()
               .AllowAnyMethod()
               .AllowCredentials(); 
@@ -78,7 +78,8 @@ builder.Services.AddScoped<IDataRepository<LivraisonDomicile>, LivraisonDomicile
 builder.Services.AddScoped<IDataRepository<Adresse>, AdresseManager>();
 builder.Services.AddScoped<IDataRepository<Ville>, VilleManager>();
 builder.Services.AddScoped<IDataRepository<Pays>, PaysManager>();
-builder.Services.AddScoped<IDataRepository<TypeProduit>, TypeProduitManager>();
+builder.Services.AddScoped<IDataRepositoryTypeProduit, TypeProduitManager>();
+
 
 
 
