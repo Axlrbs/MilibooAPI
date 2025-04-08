@@ -5,7 +5,7 @@ using MilibooAPI.Models.Repository;
 
 namespace MilibooAPI.Models.DataManager
 {
-    public class TypeProduitManager : IDataRepository<TypeProduit>
+    public class TypeProduitManager : IDataRepositoryTypeProduit
     {
         readonly MilibooDBContext? milibooContext;
         public TypeProduitManager() { }
@@ -30,6 +30,12 @@ namespace MilibooAPI.Models.DataManager
             await milibooContext.TypeProduits.AddAsync(entity);
             await milibooContext.SaveChangesAsync();
         }
+
+        public async Task<ActionResult<Categorie>> GetProduitsByIdTypeeAsync(int id)
+        {
+            return await milibooContext.Categories.Include(a => a.ACommes).ThenInclude(b => b.IdproduitNavigation).ThenInclude(c => c.EstDeCouleurs).Include(d=> d.EstDanss).ThenInclude(e=> e.IdtypeproduitNavigation).FirstOrDefaultAsync(u => u.CategorieId == id);
+        }
+
         public async Task UpdateAsync(TypeProduit typeProduit, TypeProduit entity)
         {
             milibooContext.Entry(typeProduit).State = EntityState.Modified;

@@ -263,6 +263,62 @@ namespace MilibooAPI.Controllers
         }
 
 
+        /// <summary>
+        /// Récupère (get) la première ligne de EstDeCouleur pour un ProduitId spécifique
+        /// </summary>
+        /// <param name="produitId">L'identifiant du produit</param>
+        /// <returns>Réponse http</returns>
+        /// <response code="200">Quand la première ligne a été renvoyée avec succès</response>
+        /// <response code="204">Quand aucune EstDeCouleur n'est trouvée pour ce produitId</response>
+        /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        // GET: api/EstDeCouleurs/FirstForProduit/{produitId}
+        [HttpGet("FirstForProduit/{produitId}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<EstDeCouleur>> GetFirstEstDeCouleurForProduit(int produitId)
+        {
+            // Récupérer toutes les EstDeCouleur
+            var result = await dataRepository.GetAllAsync();
+
+            // Assure-toi que la réponse contient des données
+            if (result.Value == null || !result.Value.Any())
+            {
+                return NoContent();
+            }
+
+            // Filtrer pour ne garder que les EstDeCouleurs du produitId spécifié
+            var estDeCouleursForProduit = result.Value
+                .Where(e => e.ProduitId == produitId)
+                .ToList();
+
+            // Si aucun résultat n'est trouvé pour ce produitId
+            if (!estDeCouleursForProduit.Any())
+            {
+                return NoContent();
+            }
+
+            // Trier et sélectionner la première EstDeCouleur
+            var firstEstDeCouleur = estDeCouleursForProduit
+                .OrderBy(e =>
+                {
+                    // Tenter de convertir Codephoto en entier pour un tri numérique
+                    int codephotoInt;
+                    return int.TryParse(e.Codephoto, out codephotoInt) ? codephotoInt : int.MaxValue; // Si ça échoue, on met une valeur très élevée
+                })
+                .FirstOrDefault();
+
+            // Construire l'objet de réponse avec l'URL de la photo
+            var estDeCouleurWithPhoto = new
+            {
+                EstDeCouleur = firstEstDeCouleur,
+                // Récupérer l'URL de la photo à l'aide de la méthode GetPhotoUrl
+                UrlPhoto = GetPhotoUrl(firstEstDeCouleur.Codephoto)
+            };
+
+            // Retourner le résultat
+            return Ok(estDeCouleurWithPhoto);
+        }
 
         /// <summary>
         /// Récupère (get) toutes les photos (URLs) associées à un ProduitId et un ColorisId spécifique, 

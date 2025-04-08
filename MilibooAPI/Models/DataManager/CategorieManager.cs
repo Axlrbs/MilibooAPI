@@ -25,7 +25,7 @@ namespace MilibooAPI.Models.DataManager
 
         public async Task<ActionResult<Categorie>> GetProduitsByIdCategorieAsync(int id)
         {
-            return await milibooContext.Categories.Include(a => a.ACommes).ThenInclude(b => b.IdproduitNavigation).ThenInclude(c => c.EstDeCouleurs).FirstOrDefaultAsync(u => u.CategorieId == id);
+            return await milibooContext.Categories.Include(a => a.ACommes).ThenInclude(b => b.IdproduitNavigation).ThenInclude(c => c.EstDeCouleurs) .FirstOrDefaultAsync(u => u.CategorieId == id);
         }
 
         public async Task<ActionResult<IEnumerable<Categorie>>> GetCategoriesByIdCategorieParentAsync(int id)

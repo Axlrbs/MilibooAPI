@@ -15,12 +15,12 @@ namespace MilibooAPI.Controllers
     public class TypeProduitsController : ControllerBase
     {
         //private readonly MilibooContext _context;
-        private readonly IDataRepository<TypeProduit> dataRepository;
+        private readonly IDataRepositoryTypeProduit dataRepository;
 
         /// <summary>
         /// Constructeur du controller
         /// </summary>
-        public TypeProduitsController(IDataRepository<TypeProduit> dataRepo)
+        public TypeProduitsController(IDataRepositoryTypeProduit dataRepo)
         {
             dataRepository = dataRepo;
         }
@@ -211,6 +211,39 @@ namespace MilibooAPI.Controllers
             }
 
             return NoContent();
+        }
+
+
+        /// <summary>
+        /// Récupère (get) les produits d'une catégorie par son ID
+        /// </summary>
+        /// <param name="id">L'id de la catégorie</param>
+        /// <returns>Réponse http</returns>
+        /// <response code="200">Quand la catégorie a été trouvée</response>
+        /// <response code="404">Quand la catégorie n'a pas été trouvée</response>
+        /// <response code="500">Quand il y a une erreur de serveur interne</response>
+        // GET: api/Categories/GetProduitsByIdCategorie/5
+        [HttpGet("[action]/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<Categorie>> GetProduitsByIdCategorie(int id)
+        {
+            try
+            {
+                var produits = await dataRepository.GetProduitsByIdTypeeAsync(id);
+
+                if (produits == null)
+                {
+                    return NotFound();
+                }
+
+                return produits;
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
     }
 }
