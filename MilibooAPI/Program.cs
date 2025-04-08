@@ -78,6 +78,10 @@ builder.Services.AddScoped<IDataRepository<LivraisonDomicile>, LivraisonDomicile
 builder.Services.AddScoped<IDataRepository<Adresse>, AdresseManager>();
 builder.Services.AddScoped<IDataRepository<Ville>, VilleManager>();
 builder.Services.AddScoped<IDataRepository<Pays>, PaysManager>();
+builder.Services.AddScoped<IDataRepository<EstAjouteDans>, EstAjouteDansManager>();
+builder.Services.AddScoped<IDataRepository<Panier>, PanierManager>();
+
+
 
 
 

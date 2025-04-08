@@ -129,7 +129,7 @@ namespace MilibooAPI.Controllers
         /// <response code="201">Quand le panier est créé avec succès</response>
         /// <response code="400">Quand la requête est invalide</response>
         /// <response code="500">Quand il y a une erreur de serveur interne</response>
-        [HttpPost]
+        [HttpPost("{clientId}")]
         public async Task<ActionResult<Panier>> PostPanier(int clientId)
         {
             if (!ModelState.IsValid)
