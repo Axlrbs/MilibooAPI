@@ -76,6 +76,10 @@ builder.Services.AddScoped<IDataRepositoryEstDans, EstDansManager>();
 builder.Services.AddScoped<IDataRepository<CarteBancaire>, CarteBancaireManager>();
 builder.Services.AddScoped<IDataRepository<LivraisonDomicile>, LivraisonDomicileManager>();
 builder.Services.AddScoped<IDataRepository<Adresse>, AdresseManager>();
+builder.Services.AddScoped<IDataRepository<Ville>, VilleManager>();
+builder.Services.AddScoped<IDataRepository<Pays>, PaysManager>();
+
+
 
 
 // Configure DB context
