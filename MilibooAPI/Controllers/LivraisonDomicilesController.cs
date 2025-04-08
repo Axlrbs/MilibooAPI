@@ -66,20 +66,25 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<LivraisonDomicile>> PostLivraisonDomicile(LivraisonDomicile livraison)
+        public async Task<ActionResult<LivraisonDomicile>> PostLivraisonDomicile(int idAdresse)
         {
             if (!ModelState.IsValid)
+            {
                 return BadRequest(ModelState);
+            }
 
-            try
+            var livraison = new LivraisonDomicile
             {
-                await dataRepository.AddAsync(livraison);
-                return CreatedAtAction(nameof(GetLivraisonDomicileById), new { id = livraison.LivraisonId }, livraison);
-            }
-            catch
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
-            }
+                TypeLivraisonId = 1,
+                Adresseid = idAdresse,
+                Libelletypelivraison = "Chronopost",
+                Estexpress = false,
+            };
+
+            await dataRepository.AddAsync(livraison);  // Ajoute le panier via ton DataRepository
+
+            // Renvoie un code 201 et l'URL de l'action pour récupérer ce panier
+            return CreatedAtAction(nameof(GetLivraisonDomicileById), new { livraisonId = livraison.LivraisonId }, livraison);
         }
 
         /// <summary>

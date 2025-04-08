@@ -1,5 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using MilibooAPI.Models;
 using MilibooAPI.Models.EntityFramework;
 using MilibooAPI.Models.Repository;
 
@@ -58,29 +64,7 @@ namespace MilibooAPI.Controllers
             }
         }
 
-        /// <summary>
-        /// Crée une nouvelle carte bancaire
-        /// </summary>
-        /// <param name="carteBancaire">Les informations de la carte à créer</param>
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<CarteBancaire>> PostCarteBancaire(CarteBancaire carteBancaire)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            try
-            {
-                await dataRepository.AddAsync(carteBancaire);
-                return CreatedAtAction(nameof(GetCarteBancaireById), new { id = carteBancaire.CarteBancaireId }, carteBancaire);
-            }
-            catch
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
-            }
-        }
+        
 
         /// <summary>
         /// Modifie une carte bancaire existante
