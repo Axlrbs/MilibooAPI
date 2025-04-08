@@ -15,7 +15,7 @@ namespace MilibooAPI.Models.DataManager
         }
         public async Task<ActionResult<IEnumerable<TypeProduit>>> GetAllAsync()
         {
-            return await milibooContext.TypeProduits.ToListAsync();
+            return await milibooContext.TypeProduits.OrderBy(a => a.TypeProduitId).ToListAsync();
         }
         public async Task<ActionResult<TypeProduit>> GetByIdAsync(int id)
         {
