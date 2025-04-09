@@ -361,6 +361,81 @@ namespace MilibooAPI.Controllers.Tests
             mockRepository.Verify(x => x.UpdateAsync(It.IsAny<Client>(), clientApres), Times.Once, "La mise à jour n'a pas été effectuée !");
         }
 
+
+        [TestMethod()]
+        public void ChangePassword_ValidUpdate_ReturnsNoContent()
+        {
+            // Arrange
+            Random rnd = new Random();
+            int chiffre = rnd.Next(1, 1000000000);
+
+            Client clientATester = new Client()
+            {
+                ClientId = 13,
+                NomPersonne = "Walter",
+                PrenomPersonne = "Gilbert",
+                TelPersonne = "0721481415",
+                EmailClient = "gilbert_walter" + chiffre + "@hotmail.org",
+                MdpClient = "WHG36MIH8FO",
+                NbTotalPointsFidelite = 61,
+                MoyenneAvis = (decimal)2.2,
+                NombreAvisDepose = 41
+            };
+
+            // Act
+            var result = controller.ChangePassword(13, "Nouveautest5_").Result;
+
+            // Assert
+            var utilisateur1 = context.Clients.Where(u => u.ClientId == 13).FirstOrDefault();
+            Assert.IsInstanceOfType(result, typeof(NoContentResult), "N'est pas un NoContent");
+            Assert.AreEqual(((NoContentResult)result).StatusCode, StatusCodes.Status204NoContent, "N'est pas 204");
+            Assert.AreNotEqual(utilisateur1, clientATester, "L'utilisateur n'a pas été modifié !");
+        }
+
+        [TestMethod()]
+        public void ChangePassword_ValidUpdate_ReturnsNoContent_Moq()
+        {
+            // Arrange
+            Random rnd = new Random();
+            int chiffre = rnd.Next(1, 1000000000);
+
+            Client clientAvant = new Client()
+            {
+                ClientId = 13,
+                NomPersonne = "Walter",
+                PrenomPersonne = "Gilbert",
+                TelPersonne = "0721481415",
+                EmailClient = "gilbert_walter@hotmail.org",
+                MdpClient = "WHG36MIH8FO",
+                NbTotalPointsFidelite = 61,
+                MoyenneAvis = (decimal)2.2,
+                NombreAvisDepose = 41
+            };
+
+            Client clientApres = new Client()
+            {
+                ClientId = 13,
+                NomPersonne = "Walter",
+                PrenomPersonne = "Gilbert",
+                TelPersonne = "0721481415",
+                EmailClient = "gilbert_walter@hotmail.org", 
+                MdpClient = "Nouveautest5_",
+                NbTotalPointsFidelite = 61,
+                MoyenneAvis = (decimal)2.2,
+                NombreAvisDepose = 41
+            };
+            mockRepository.Setup(x => x.GetByIdAsync(13).Result).Returns(clientAvant);
+
+            // Act
+            var result = controllerMoq.ChangePassword(13, "Nouveautest5_").Result;
+
+            // Assert
+            Assert.IsInstanceOfType(result, typeof(NoContentResult), "N'est pas un NoContent");
+            Assert.AreEqual(((NoContentResult)result).StatusCode, StatusCodes.Status204NoContent, "N'est pas 204");
+
+            mockRepository.Verify(x => x.UpdateAsync(It.IsAny<Client>(), clientApres), Times.Once, "La mise à jour n'a pas été effectuée !");
+        }
+
         [TestMethod]
         public void PostClient_ModelValidated_CreationOK()
         {
