@@ -26,6 +26,20 @@ namespace MilibooAPI.Models.DataManager
             return await milibooContext.EstDeCouleurs.FirstOrDefaultAsync(u => u.Nomproduit.ToUpper() == nom.ToUpper());
         }
 
+        public async Task<ActionResult<IEnumerable<EstDeCouleur>>> GetNews()
+        {
+            var results = await milibooContext.EstDeCouleurs
+                .Include(a => a.IdproduitNavigation)
+                .ThenInclude(b => b.Appartients)
+                .Where(b => b.IdproduitNavigation.Appartients.Any(c => c.RegroupementId == 1))
+                .ToListAsync();
+
+            return results;
+
+
+            //return await milibooContext.EstDeCouleurs.ToListAsync();
+        }
+
         public async Task<ActionResult<IEnumerable<object>>> GetCouleursByProduit(int produitId)
         {
             return await milibooContext.EstDeCouleurs
@@ -41,7 +55,6 @@ namespace MilibooAPI.Models.DataManager
 
             
         }
-
 
 
 
