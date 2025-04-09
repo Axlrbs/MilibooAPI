@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MilibooAPI.Controllers;
 using MilibooAPI.Models.EntityFramework;
@@ -11,6 +9,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MilibooAPI.Models.EntityFramework;
+using MilibooAPI.Models.Repository;
+using Microsoft.EntityFrameworkCore;
+using Moq;
+using Microsoft.AspNetCore.Mvc;
+using MilibooAPI.Models.DataManager;
+using MilibooAPI.Models;
+using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 
 namespace MilibooAPI.Controllers.Tests
 {
@@ -195,45 +202,102 @@ namespace MilibooAPI.Controllers.Tests
             var adresse = new Adresse { AdresseId = 1, Rue = "123 Rue de Paris", CodePostal = 75001, NumeroInsee = "75001", PaysId = "FR" };
             mockRepository.Setup(repo => repo.AddAsync(adresse)).Returns(Task.CompletedTask);
 
+            CreateAdresseDTO adresseAtester = new CreateAdresseDTO()
+            {
+                Rue = "123 Rue de Paris",
+                CodePostal = 75001,
+                NumeroInsee = "75001",
+                PaysId = "FR",
+            };
+
             // Act
-            var result = await controllerMoq.PostAdresse(adresse);
+            var result = await controllerMoq.PostAdresse(adresseAtester);
+
+
 
             // Assert
-            var createdResult = result.Result as CreatedAtActionResult;
-            Assert.IsNotNull(createdResult);
-            Assert.AreEqual("GetAdresseById", createdResult.ActionName);
-            Assert.AreEqual(adresse.AdresseId, ((Adresse)createdResult.Value).AdresseId);
+            Adresse? adresseRecuperee = context.Adresses
+           .Where(a => a.Rue.ToUpper() == adresseAtester.Rue.ToUpper()
+                    && a.CodePostal == adresseAtester.CodePostal
+                    && a.NumeroInsee == adresseAtester.NumeroInsee
+                    && a.PaysId == adresseAtester.PaysId)
+           .FirstOrDefault();
+
+                Assert.IsNotNull(adresseRecuperee, "L'adresse n'a pas été retrouvée dans la base.");
+
+                int adresseId = adresseRecuperee.AdresseId;
+
+                Assert.IsInstanceOfType(result, typeof(ActionResult<Adresse>), "Pas un ActionResult<Adresse>");
+                Assert.IsInstanceOfType(result.Result, typeof(CreatedAtActionResult), "Pas un CreatedAtActionResult");
+
+                var createdAtResult = result.Result as CreatedAtActionResult;
+
+                CreateAdresseDTO derniereAdresseEnDTO = new CreateAdresseDTO()
+                {
+                    Rue = adresseRecuperee.Rue,
+                    CodePostal = (int)adresseRecuperee.CodePostal,
+                    NumeroInsee = adresseRecuperee.NumeroInsee,
+                    PaysId = adresseRecuperee.PaysId
+                };
+
+                Assert.AreEqual(adresseAtester.Rue, derniereAdresseEnDTO.Rue, "Les rues ne correspondent pas.");
+                Assert.AreEqual(adresseAtester.CodePostal, derniereAdresseEnDTO.CodePostal, "Les codes postaux ne correspondent pas.");
+                Assert.AreEqual(adresseAtester.NumeroInsee, derniereAdresseEnDTO.NumeroInsee, "Les INSEE ne correspondent pas.");
+                Assert.AreEqual(adresseAtester.PaysId, derniereAdresseEnDTO.PaysId, "Les pays ne correspondent pas.");
         }
 
         [TestMethod]
         public async Task PostAdresse_ShouldReturnBadRequest_WhenModelStateIsInvalid()
         {
             // Arrange
-            var adresse = new Adresse { AdresseId = 1, Rue = "123 Rue de Paris", PaysId = "FR" };
+            CreateAdresseDTO adresseAtester = new CreateAdresseDTO()
+            {
+                Rue = "123 Rue de Paris",
+                // CodePostal est manquant pour tester la validation
+                NumeroInsee = "75001",
+                PaysId = "FR",
+            };
+
             controllerMoq.ModelState.AddModelError("CodePostal", "Required");
 
             // Act
-            var result = await controllerMoq.PostAdresse(adresse);
+            var result = await controllerMoq.PostAdresse(adresseAtester);
 
             // Assert
-            Assert.IsInstanceOfType(result.Result, typeof(BadRequestObjectResult));
+            Assert.IsInstanceOfType(result, typeof(ActionResult<Adresse>), "Le résultat n'est pas un ActionResult<Adresse>");
+            Assert.IsInstanceOfType(result.Result, typeof(BadRequestObjectResult), "La réponse ne doit pas être un BadRequestObjectResult");
+
+            var badRequestResult = result.Result as BadRequestObjectResult;
+            Assert.IsNotNull(badRequestResult, "Le résultat devrait être un BadRequestObjectResult.");
+
+            Assert.IsTrue(badRequestResult.Value.ToString().Contains("CodePostal"), "Le message d'erreur devrait mentionner 'CodePostal'.");
         }
 
         [TestMethod]
         public async Task PostAdresse_ShouldReturn500_WhenExceptionIsThrown()
         {
             // Arrange
-            var adresse = new Adresse { AdresseId = 1, Rue = "123 Rue de Paris", CodePostal = 75001, NumeroInsee = "75001", PaysId = "FR" };
-            mockRepository.Setup(repo => repo.AddAsync(adresse)).ThrowsAsync(new Exception("Database error"));
+            CreateAdresseDTO adresseAtester = new CreateAdresseDTO()
+            {
+                Rue = "123 Rue de Paris",
+                CodePostal = 75001,
+                NumeroInsee = "75001",
+                PaysId = "FR",
+            };
+
+            // Simule une exception lors de l'ajout de l'adresse
+            mockRepository.Setup(repo => repo.AddAsync(It.IsAny<Adresse>())).ThrowsAsync(new Exception("Database error"));
 
             // Act
-            var result = await controllerMoq.PostAdresse(adresse);
+            var result = await controllerMoq.PostAdresse(adresseAtester);
 
             // Assert
-            Assert.IsInstanceOfType(result.Result, typeof(ObjectResult));
-            var statusCodeResult = result.Result as ObjectResult;
-            Assert.IsNotNull(statusCodeResult);
-            Assert.AreEqual(StatusCodes.Status500InternalServerError, statusCodeResult.StatusCode);
+            Assert.IsInstanceOfType(result, typeof(ActionResult<Adresse>), "Le résultat n'est pas un ActionResult<Adresse>");
+            Assert.IsInstanceOfType(result.Result, typeof(ObjectResult), "Le résultat n'est pas un ObjectResult");
+
+            var objectResult = result.Result as ObjectResult;
+            Assert.IsNotNull(objectResult, "Le résultat devrait être un ObjectResult.");
+            Assert.AreEqual(StatusCodes.Status500InternalServerError, objectResult.StatusCode, "Le code de statut ne correspond pas à une erreur serveur interne.");
         }
 
         [TestMethod]
