@@ -6,5 +6,6 @@ namespace MilibooAPI.Models.Repository
     public interface IDataRepositoryClient : IDataRepository<Client>
     {
         Task<ActionResult<Client>> GetByStringBisAsync(string str);
+        Task ChangePassword(int id, string pwd);
     }
 }

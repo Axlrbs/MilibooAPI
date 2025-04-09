@@ -196,6 +196,25 @@ namespace MilibooAPI.Controllers
         }
 
         /// <summary>
+        /// Modifie le mot de passe d'un client.
+        /// </summary>
+        /// <param name="id">L'id du client.</param>
+        /// <param name="pwd">Le mot de passe hashé du client.</param>
+        /// <returns>Une réponse HTTP 204 NoContent.</returns>
+        /// <response code="204">Le mot de passe a été modifié avec succès.</response>
+        /// <response code="500">Une erreur interne s'est produite sur le serveur.</response>
+        // PUT: api/Clients/ChangePassword/{id, mdp}
+        [HttpPut("{id}&{pwd}")]
+        [ActionName("ChangePassword")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> ChangePassword(int id, string pwd)
+        {
+            await dataRepositoryClient.ChangePassword(id, pwd);
+            return NoContent();
+        }
+
+        /// <summary>
         /// Crée (post) un nouveau client
         /// </summary>
         /// <param name="client">Le client à créer</param>

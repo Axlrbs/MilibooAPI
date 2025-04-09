@@ -25,9 +25,11 @@ namespace MilibooAPI.Models.DataManager
         {
             return await milibooContext.Clients.FirstOrDefaultAsync(u => u.NomPersonne.ToUpper() == nom.ToUpper());
         }
-        public async Task<ActionResult<Client>> GetByStringBisAsync(string email)
+        public async Task ChangePassword(int id, string pwd)
         {
-            return await milibooContext.Clients.FirstOrDefaultAsync(u => u.EmailClient.ToUpper() == email.ToUpper());
+            var client = GetByIdAsync(id).Result.Value;
+            client.MdpClient = pwd;
+            await milibooContext.SaveChangesAsync();
         }
 
         public async Task AddAsync(Client entity)
