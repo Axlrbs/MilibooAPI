@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using MilibooAPI.Models.EntityFramework;
 using MilibooAPI.Models.Repository;
 
@@ -24,6 +25,11 @@ namespace MilibooAPI.Models.DataManager
         public async Task<ActionResult<Client>> GetByStringAsync(string nom)
         {
             return await milibooContext.Clients.FirstOrDefaultAsync(u => u.NomPersonne.ToUpper() == nom.ToUpper());
+        }
+
+        public async Task<ActionResult<Client>> GetByStringBisAsync(string email)
+        {
+            return await milibooContext.Clients.FirstOrDefaultAsync(u => u.EmailClient.ToUpper() == email.ToUpper());
         }
         public async Task ChangePassword(int id, string pwd)
         {
