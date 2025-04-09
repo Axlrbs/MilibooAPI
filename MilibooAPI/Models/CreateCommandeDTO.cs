@@ -10,7 +10,6 @@ namespace MilibooAPI.Models
         public int LivraisonId { get; set; }
         public int CarteBancaireId { get; set; }
         public decimal MontantCommande {  get; set; }
-        public DateTime DateFacture { get; set; } = DateTime.Now;
         public int NbPointFidelite { get; set; }
         public string Statut { get; set; } = "en attente de validation";
 
@@ -23,7 +22,6 @@ namespace MilibooAPI.Models
                    LivraisonId == dTO.LivraisonId &&
                    CarteBancaireId == dTO.CarteBancaireId &&
                    MontantCommande == dTO.MontantCommande &&
-                   DateFacture == dTO.DateFacture &&
                    NbPointFidelite == dTO.NbPointFidelite &&
                    Statut == dTO.Statut;
         }

@@ -64,7 +64,43 @@ namespace MilibooAPI.Controllers
             }
         }
 
-        
+
+        /// <summary>
+        /// Crée une nouvelle carte bancaire
+        /// </summary>
+        /// <param name="carteDTO">Objet carte bancaire à créer</param>
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<CarteBancaire>> PostCarte(CreateCarteDTO carteDTO)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Créer une nouvelle carte bancaire à partir du DTO
+            var carteBancaire = new CarteBancaire
+            {
+                NomCarte = carteDTO.NomCarte,
+                NumCarte = carteDTO.NumCarte,
+                DateExpiration = carteDTO.DateExpiration,
+                Cvvcarte = carteDTO.Cvvcarte
+            };
+
+            try
+            {
+                // Ajouter la carte bancaire à la base de données
+                await dataRepository.AddAsync(carteBancaire);
+                return CreatedAtAction(nameof(GetCarteBancaireById), new { id = carteBancaire.CarteBancaireId }, carteBancaire);
+            }
+            catch
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
+        }
+
 
         /// <summary>
         /// Modifie une carte bancaire existante

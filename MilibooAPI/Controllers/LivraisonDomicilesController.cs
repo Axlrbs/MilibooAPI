@@ -62,7 +62,7 @@ namespace MilibooAPI.Controllers
         /// Crée une nouvelle livraison à domicile
         /// </summary>
         /// <param name="livraison">Objet livraison à créer</param>
-        [HttpPost]
+        [HttpPost("{idAdresse}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -84,7 +84,7 @@ namespace MilibooAPI.Controllers
             await dataRepository.AddAsync(livraison);  // Ajoute le panier via ton DataRepository
 
             // Renvoie un code 201 et l'URL de l'action pour récupérer ce panier
-            return CreatedAtAction(nameof(GetLivraisonDomicileById), new { livraisonId = livraison.LivraisonId }, livraison);
+            return CreatedAtAction(nameof(GetLivraisonDomicileById), new { id = livraison.LivraisonId }, livraison);
         }
 
         /// <summary>

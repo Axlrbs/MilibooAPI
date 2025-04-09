@@ -215,7 +215,7 @@ namespace MilibooAPI.Controllers
                 LivraisonId = commandeDTO.LivraisonId,
                 CarteBancaireId = commandeDTO.CarteBancaireId,
                 MontantCommande = commandeDTO.MontantCommande,
-                DateFacture = commandeDTO.DateFacture,
+                DateFacture = DateTime.UtcNow.Date,
                 NbPointFidelite = commandeDTO.NbPointFidelite,
                 Statut = commandeDTO.Statut,
             };
