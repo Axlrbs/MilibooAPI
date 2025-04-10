@@ -106,7 +106,7 @@ namespace MilibooAPI.Controllers
                 CodePostal = adresseDTO.CodePostal,
             };
 
-            await dataRepository.AddAsync(adresse);
+            var result = await dataRepository.AddAsync(adresse);
             return CreatedAtAction(nameof(GetAdresseById), new { id = adresse.AdresseId }, adresse);
         }
 

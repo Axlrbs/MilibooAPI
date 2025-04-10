@@ -199,8 +199,8 @@ namespace MilibooAPI.Controllers.Tests
         public async Task PostAdresseTest_ValidCreate()
         {
             // Arrange
-            var adresse = new Adresse { AdresseId = 1, Rue = "123 Rue de Paris", CodePostal = 75001, NumeroInsee = "75001", PaysId = "FR" };
-            mockRepository.Setup(repo => repo.AddAsync(adresse)).Returns(Task.CompletedTask);
+            /*var adresse = new Adresse { AdresseId = 1, Rue = "123 Rue de Paris", CodePostal = 75001, NumeroInsee = "75001", PaysId = "FR" };
+            mockRepository.Setup(repo => repo.AddAsync(adresse)).Returns(Task.CompletedTask);*/
 
             CreateAdresseDTO adresseAtester = new CreateAdresseDTO()
             {
@@ -211,8 +211,8 @@ namespace MilibooAPI.Controllers.Tests
             };
 
             // Act
-            var result = await controllerMoq.PostAdresse(adresseAtester);
-
+            var result = await controller.PostAdresse(adresseAtester);
+            Console.WriteLine("post ok");
 
 
             // Assert
