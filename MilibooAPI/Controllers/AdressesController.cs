@@ -93,21 +93,28 @@ namespace MilibooAPI.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<Adresse>> PostAdresse(CreateAdresseDTO adresseDTO)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var adresse = new Adresse
+                {
+                    NumeroInsee = adresseDTO.NumeroInsee,
+                    PaysId = adresseDTO.PaysId,
+                    Rue = adresseDTO.Rue,
+                    CodePostal = adresseDTO.CodePostal,
+                };
+
+                await dataRepository.AddAsync(adresse);
+                return CreatedAtAction(nameof(GetAdresseById), new { id = adresse.AdresseId }, adresse);
             }
-
-            var adresse = new Adresse
+            catch
             {
-                NumeroInsee = adresseDTO.NumeroInsee,
-                PaysId = adresseDTO.PaysId,
-                Rue = adresseDTO.Rue,
-                CodePostal = adresseDTO.CodePostal,
-            };
-
-            var result = await dataRepository.AddAsync(adresse);
-            return CreatedAtAction(nameof(GetAdresseById), new { id = adresse.AdresseId }, adresse);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Erreur interne du serveur");
+            }
         }
 
         /// <summary>
